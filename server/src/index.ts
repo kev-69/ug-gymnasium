@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import morganMiddleware from './middleware/morgan';
+import logger from './utils/logger';
 
 dotenv.config();
 
@@ -11,6 +13,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(morganMiddleware);
 
 // Routes
 app.get('/', (req: Request, res: Response) => {
@@ -23,7 +26,8 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  logger.info(`🚀 Server is running on port ${PORT}`);
+  logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
 });
 
 export default app;
