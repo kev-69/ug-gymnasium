@@ -1,14 +1,204 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// UG Gymnasium Database Schema
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  STUDENT
+  STAFF
+  PUBLIC
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  PENDING
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  PAYSTACK
+  MOBILE_MONEY
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+// Single User model instead of separate Student/Staff/Public/Admin models
+// This follows DRY principle and makes authentication easier
+model User {
+  id              String   @id @default(uuid())
+  
+  // Authentication
+  email           String   @unique
+  password        String
+  role            UserRole
+  
+  // Personal Information
+  surname         String
+  otherNames      String
+  phone           String
+  gender          Gender
+  
+  // Student-specific fields (nullable for non-students)
+  studentId       String?  @unique
+  residence       Boolean  @default(false)
+  hallOfResidence String?
+  
+  // Staff-specific fields (nullable for non-staff)
+  staffId         String?  @unique
+  
+  // Account status
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  subscriptions   Subscription[]
+  
+  @@index([email])
+  @@index([studentId])
+  @@index([staffId])
+  @@map("users")
+}
+
+// Single unified Plan model instead of StudentPlan/StaffPlan/PublicPlan
+// More flexible and easier to maintain
+model Plan {
+  id              String   @id @default(uuid())
+  
+  // Plan Details
+  name            String   // e.g., "Student Monthly", "Staff Quarterly", "Public Annual"
+  description     String?
+  price           Float    // Changed from String to Float for proper calculations
+  duration        Int      // Duration in days (e.g., 30, 90, 365)
+  
+  // Target audience
+  targetRole      UserRole // Which user type this plan is for
+  
+  // Features & Benefits
+  features        String[] // Array of features (e.g., ["Gym access", "Pool access"])
+  
+  // Status
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  subscriptions   Subscription[]
+  
+  @@index([targetRole])
+  @@map("plans")
+}
+
+// Renamed from Subscriptions to Subscription (singular, follows Prisma convention)
+model Subscription {
+  id                    String             @id @default(uuid())
+  
+  // Relations - Fixed: Added proper types
+  userId                String
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  planId                String
+  plan                  Plan               @relation(fields: [planId], references: [id])
+  
+  // Subscription Details
+  subscriptionStatus    SubscriptionStatus @default(PENDING)
+  paymentStatus         PaymentStatus      @default(PENDING)
+  
+  // Duration tracking
+  startDate             DateTime?
+  endDate               DateTime?
+  
+  // Auto-renewal
+  autoRenew             Boolean            @default(false)
+  
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  // Relations
+  transactions          Transaction[]
+  
+  @@index([userId])
+  @@index([planId])
+  @@index([subscriptionStatus])
+  @@map("subscriptions")
+}
+
+// Renamed from Transactions to Transaction (singular)
+model Transaction {
+  id                    String        @id @default(uuid())
+  
+  // Relations
+  subscriptionId        String
+  subscription          Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  
+  // Payment Details
+  amount                Float         // Changed from String to Float
+  currency              String        @default("GHS")
+  paymentMethod         PaymentMethod
+  
+  // References for tracking
+  paymentReference      String        @unique // Our internal reference
+  paystackReference     String?       // Paystack transaction reference (nullable until payment processed)
+  
+  // Status
+  paymentStatus         PaymentStatus @default(PENDING)
+  
+  // Additional Info
+  metadata              Json?         // Store any additional Paystack data
+  paidAt                DateTime?     // When payment was completed
+  
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  
+  @@index([subscriptionId])
+  @@index([paymentReference])
+  @@index([paymentStatus])
+  @@map("transactions")
+}
+
+// Optional: Admin activity logging
+model Admin {
+  id              String   @id @default(uuid())
+  surname         String
+  otherNames      String
+  gender          Gender
+  email           String   @unique
+  password        String
+  
+  // Admin-specific
+  isSuperAdmin    Boolean  @default(false)
+  permissions     String[] // Array of permission strings
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([email])
+  @@map("admins")
 }
