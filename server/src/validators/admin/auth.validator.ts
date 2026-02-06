@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { Gender } from '@prisma/client';
 
 // Password validation schema
 const passwordSchema = z
@@ -15,7 +14,7 @@ export const adminSignupSchema = z.object({
   body: z.object({
     surname: z.string().min(1, 'Surname is required'),
     otherNames: z.string().min(1, 'Other names are required'),
-    gender: z.nativeEnum(Gender),
+    gender: z.enum(['MALE', 'FEMALE']),
     email: z.string().email('Invalid email format'),
     password: passwordSchema,
     isSuperAdmin: z.boolean().optional().default(false),
