@@ -73,3 +73,26 @@ export const decodeToken = (token: string): JwtPayload | null => {
     return null;
   }
 };
+
+/**
+ * Generate password reset token (expires in 1 hour)
+ */
+export const generatePasswordResetToken = (userId: string, email: string): string => {
+  return jwt.sign({ userId, email, type: 'password-reset' }, JWT_SECRET, { expiresIn: '1h' });
+};
+
+/**
+ * Verify password reset token
+ */
+export const verifyPasswordResetToken = (token: string): { userId: string; email: string } => {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    if (decoded.type !== 'password-reset') {
+      throw new Error('Invalid token type');
+    }
+    return { userId: decoded.userId, email: decoded.email };
+  } catch (error) {
+    throw new Error('Invalid or expired reset token');
+  }
+};
+
