@@ -11,6 +11,8 @@ import adminTransactionRoutes from './routes/admin/transaction.routes';
 import userPlanRoutes from './routes/user/plan.routes';
 import userSubscriptionRoutes from './routes/user/subscription.routes';
 import userPaymentRoutes from './routes/user/payment.routes';
+import userTransactionRoutes from './routes/user/transaction.routes';
+import { startSubscriptionExpirationJob } from './jobs/subscriptionExpiration.job';
 
 dotenv.config();
 
@@ -34,6 +36,7 @@ app.get('/', (req: Request, res: Response) => {
       plans: '/api/plans',
       subscriptions: '/api/subscriptions',
       payments: '/api/payments',
+      transactions: '/api/transactions',
       adminAuth: '/api/admin/auth',
       adminPlans: '/api/admin/plans',
       adminUsers: '/api/admin/users',
@@ -51,6 +54,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/plans', userPlanRoutes);
 app.use('/api/subscriptions', userSubscriptionRoutes);
 app.use('/api/payments', userPaymentRoutes);
+app.use('/api/transactions', userTransactionRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/plans', adminPlanRoutes);
 app.use('/api/admin/users', adminUserRoutes);
@@ -81,10 +85,12 @@ app.listen(PORT, () => {
   logger.info(`📋 User Plans: /api/plans`);
   logger.info(`📝 User Subscriptions: /api/subscriptions`);
   logger.info(`💳 User Payments: /api/payments`);
+  logger.info(`� User Transactions: /api/transactions`);
   logger.info(`👑 Admin Auth: /api/admin/auth`);
   logger.info(`📊 Admin Plans: /api/admin/plans`);
   logger.info(`👥 Admin Users: /api/admin/users`);
-  logger.info(`💰 Admin Transactions: /api/admin/transactions`);
-});
+  logger.info(`💸 Admin Transactions: /api/admin/transactions`);  
+  // Start cron jobs
+  startSubscriptionExpirationJob();});
 
 export default app;
