@@ -3,11 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import morganMiddleware from './middleware/morgan';
 import logger from './utils/logger';
-import authRoutes from './routes/auth.routes';
+import authRoutes from './routes/user/auth.routes';
 import adminAuthRoutes from './routes/admin/auth.routes';
 import adminPlanRoutes from './routes/admin/plan.routes';
 import adminUserRoutes from './routes/admin/user.routes';
 import adminTransactionRoutes from './routes/admin/transaction.routes';
+import userPlanRoutes from './routes/user/plan.routes';
+import userSubscriptionRoutes from './routes/user/subscription.routes';
+import userPaymentRoutes from './routes/user/payment.routes';
 
 dotenv.config();
 
@@ -28,6 +31,9 @@ app.get('/', (req: Request, res: Response) => {
     endpoints: {
       health: '/api/health',
       auth: '/api/auth',
+      plans: '/api/plans',
+      subscriptions: '/api/subscriptions',
+      payments: '/api/payments',
       adminAuth: '/api/admin/auth',
       adminPlans: '/api/admin/plans',
       adminUsers: '/api/admin/users',
@@ -42,6 +48,9 @@ app.get('/api/health', (req: Request, res: Response) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/plans', userPlanRoutes);
+app.use('/api/subscriptions', userSubscriptionRoutes);
+app.use('/api/payments', userPaymentRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/plans', adminPlanRoutes);
 app.use('/api/admin/users', adminUserRoutes);
@@ -68,11 +77,14 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 app.listen(PORT, () => {
   logger.info(`🚀 Server is running on port ${PORT}`);
   logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
-  logger.info(`🔐 Auth routes: /api/auth`);
-  logger.info(`👑 Admin routes: /api/admin/auth`);
-  logger.info(`📋 Plan routes: /api/admin/plans`);
-  logger.info(`👥 User routes: /api/admin/users`);
-  logger.info(`💰 Transaction routes: /api/admin/transactions`);
+  logger.info(`🔐 User Auth: /api/auth`);
+  logger.info(`📋 User Plans: /api/plans`);
+  logger.info(`📝 User Subscriptions: /api/subscriptions`);
+  logger.info(`💳 User Payments: /api/payments`);
+  logger.info(`👑 Admin Auth: /api/admin/auth`);
+  logger.info(`📊 Admin Plans: /api/admin/plans`);
+  logger.info(`👥 Admin Users: /api/admin/users`);
+  logger.info(`💰 Admin Transactions: /api/admin/transactions`);
 });
 
 export default app;
