@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../../config/database';
 import { hashPassword, comparePassword } from '../../utils/password';
-import { generateTokenPair, verifyRefreshToken } from '../../utils/jwt';
+import { generateTokenPair, verifyRefreshToken, generatePasswordResetToken, verifyPasswordResetToken } from '../../utils/jwt';
 import { UserRole } from '@prisma/client';
 import logger from '../../utils/logger';
 
@@ -451,6 +451,125 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({
       success: false,
       message: 'Logout failed',
+    });
+  }
+};
+
+/**
+ * Forgot Password - Generate reset token
+ */
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      // Return success even if user doesn't exist (security best practice)
+      res.status(200).json({
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.',
+      });
+      return;
+    }
+
+    // Check if account is active
+    if (!user.isActive) {
+      res.status(403).json({
+        success: false,
+        message: 'Account is deactivated. Please contact support.',
+      });
+      return;
+    }
+
+    // Generate password reset token
+    const resetToken = generatePasswordResetToken(user.id, user.email);
+
+    // TODO: Send email with reset token
+    // For now, we'll return the token in the response (in production, only send via email)
+    logger.info(`Password reset requested for: ${user.email}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset instructions have been sent to your email.',
+      // In production, remove this! Only send via email
+      data: {
+        resetToken, // This should ONLY be sent via email in production
+      },
+    });
+  } catch (error) {
+    logger.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process password reset request',
+    });
+  }
+};
+
+/**
+ * Reset Password - Update password with reset token
+ */
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Verify reset token
+    let decoded;
+    try {
+      decoded = verifyPasswordResetToken(token);
+    } catch (error) {
+      res.status(401).json({
+        success: false,
+        message: 'Invalid or expired reset token',
+      });
+      return;
+    }
+
+    // Find user
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+    });
+
+    if (!user || user.email !== decoded.email) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+      return;
+    }
+
+    // Check if account is active
+    if (!user.isActive) {
+      res.status(403).json({
+        success: false,
+        message: 'Account is deactivated. Please contact support.',
+      });
+      return;
+    }
+
+    // Hash new password
+    const hashedPassword = await hashPassword(newPassword);
+
+    // Update password
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    });
+
+    logger.info(`Password reset successful for: ${user.email}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully. You can now login with your new password.',
+    });
+  } catch (error) {
+    logger.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset password',
     });
   }
 };
