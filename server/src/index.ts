@@ -31,16 +31,9 @@ app.get('/', (req: Request, res: Response) => {
     message: 'UG Gymnasium API is running!',
     version: '1.0.0',
     endpoints: {
+      welcome: '/',
       health: '/api/health',
-      auth: '/api/auth',
       plans: '/api/plans',
-      subscriptions: '/api/subscriptions',
-      payments: '/api/payments',
-      transactions: '/api/transactions',
-      adminAuth: '/api/admin/auth',
-      adminPlans: '/api/admin/plans',
-      adminUsers: '/api/admin/users',
-      adminTransactions: '/api/admin/transactions',
     }
   });
 });
