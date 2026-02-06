@@ -35,11 +35,10 @@ enum PaymentStatus {
   PENDING
   COMPLETED
   FAILED
-  REFUNDED
 }
 
 enum PaymentMethod {
-  PAYSTACK
+  CARD
   MOBILE_MONEY
 }
 
@@ -135,9 +134,6 @@ model Subscription {
   startDate             DateTime?
   endDate               DateTime?
   
-  // Auto-renewal
-  autoRenew             Boolean            @default(false)
-  
   createdAt             DateTime           @default(now())
   updatedAt             DateTime           @updatedAt
 
@@ -160,7 +156,6 @@ model Transaction {
   
   // Payment Details
   amount                Float         // Changed from String to Float
-  currency              String        @default("GHS")
   paymentMethod         PaymentMethod
   
   // References for tracking
