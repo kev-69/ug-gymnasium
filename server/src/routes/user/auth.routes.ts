@@ -7,6 +7,8 @@ import {
   refreshToken,
   getProfile,
   logout,
+  forgotPassword,
+  resetPassword,
 } from '../../controllers/user/auth.controller';
 import { validateRequest } from '../../middleware/validate.middleware';
 import { authenticate } from '../../middleware/auth.middleware';
@@ -16,6 +18,8 @@ import {
   publicSignupSchema,
   loginSchema,
   refreshTokenSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../../validators/user/auth.validator';
 
 const router = Router();
@@ -80,5 +84,19 @@ router.get('/profile', authenticate, getProfile);
  * @access  Private
  */
 router.post('/logout', authenticate, logout);
+
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Request password reset
+ * @access  Public
+ */
+router.post('/forgot-password', validateRequest(forgotPasswordSchema), forgotPassword);
+
+/**
+ * @route   POST /api/auth/reset-password
+ * @desc    Reset password with token
+ * @access  Public
+ */
+router.post('/reset-password', validateRequest(resetPasswordSchema), resetPassword);
 
 export default router;
