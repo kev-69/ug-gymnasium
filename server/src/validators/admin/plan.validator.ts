@@ -7,7 +7,7 @@ export const createPlanSchema = z.object({
     name: z.string().min(1, 'Plan name is required'),
     description: z.string().min(1, 'Description is required'),
     price: z.number().positive('Price must be a positive number'),
-    durationInDays: z.number().int().positive('Duration must be a positive integer'),
+    duration: z.number().int().positive('Duration must be a positive integer'),
     targetRole: z.nativeEnum(UserRole),
     features: z.array(z.string()).min(1, 'At least one feature is required'),
     isActive: z.boolean().optional().default(true),
