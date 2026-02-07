@@ -1,5 +1,10 @@
 import jwt from 'jsonwebtoken';
 import { UserRole } from '@prisma/client';
+interface AdminJwtPayload {
+  userId: string;
+  email: string;
+  role: 'ADMIN' ;
+}
 
 interface JwtPayload {
   userId: string;
@@ -20,6 +25,11 @@ const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 /**
  * Generate access token (short-lived)
  */
+
+export const adminAccessToken = (payload: AdminJwtPayload): string => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN as any });
+};
+
 export const generateAccessToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN as any });
 };
@@ -27,6 +37,10 @@ export const generateAccessToken = (payload: JwtPayload): string => {
 /**
  * Generate refresh token (long-lived)
  */
+export const adminRefreshToken = (payload: AdminJwtPayload): string => {
+  return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN as any });
+};
+
 export const generateRefreshToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRES_IN as any });
 };
@@ -34,6 +48,13 @@ export const generateRefreshToken = (payload: JwtPayload): string => {
 /**
  * Generate both access and refresh tokens
  */
+export const generateAdminTokenPair = (payload: AdminJwtPayload): TokenPair => {
+  return {
+    accessToken: adminAccessToken(payload),
+    refreshToken: adminRefreshToken(payload),
+  };
+};
+
 export const generateTokenPair = (payload: JwtPayload): TokenPair => {
   return {
     accessToken: generateAccessToken(payload),
@@ -44,6 +65,14 @@ export const generateTokenPair = (payload: JwtPayload): TokenPair => {
 /**
  * Verify access token
  */
+export const verifyAdminAccessToken = (token: string): AdminJwtPayload => {
+  try {
+    return jwt.verify(token, JWT_SECRET) as AdminJwtPayload;
+  } catch (error) {
+    throw new Error('Invalid or expired access token');
+  }
+};
+
 export const verifyAccessToken = (token: string): JwtPayload => {
   try {
     return jwt.verify(token, JWT_SECRET) as JwtPayload;
@@ -55,6 +84,14 @@ export const verifyAccessToken = (token: string): JwtPayload => {
 /**
  * Verify refresh token
  */
+export const verifyAdminRefreshToken = (token: string): AdminJwtPayload => {
+  try {
+    return jwt.verify(token, JWT_REFRESH_SECRET) as AdminJwtPayload;
+  } catch (error) {
+    throw new Error('Invalid or expired refresh token');
+  }
+};
+
 export const verifyRefreshToken = (token: string): JwtPayload => {
   try {
     return jwt.verify(token, JWT_REFRESH_SECRET) as JwtPayload;
@@ -66,6 +103,14 @@ export const verifyRefreshToken = (token: string): JwtPayload => {
 /**
  * Decode token without verification (useful for debugging)
  */
+export const decodeAdminToken = (token: string): AdminJwtPayload | null => {
+  try {
+    return jwt.decode(token) as AdminJwtPayload;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const decodeToken = (token: string): JwtPayload | null => {
   try {
     return jwt.decode(token) as JwtPayload;
