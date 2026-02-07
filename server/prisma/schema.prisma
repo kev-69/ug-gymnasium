@@ -11,12 +11,10 @@ datasource db {
 // ============================================
 // ENUMS
 // ============================================
-
 enum UserRole {
   STUDENT
   STAFF
   PUBLIC
-  ADMIN
 }
 
 enum Gender {
@@ -45,9 +43,6 @@ enum PaymentMethod {
 // ============================================
 // MODELS
 // ============================================
-
-// Single User model instead of separate Student/Staff/Public/Admin models
-// This follows DRY principle and makes authentication easier
 model User {
   id              String   @id @default(uuid())
   
@@ -85,8 +80,6 @@ model User {
   @@map("users")
 }
 
-// Single unified Plan model instead of StudentPlan/StaffPlan/PublicPlan
-// More flexible and easier to maintain
 model Plan {
   id              String   @id @default(uuid())
   
@@ -115,7 +108,6 @@ model Plan {
   @@map("plans")
 }
 
-// Renamed from Subscriptions to Subscription (singular, follows Prisma convention)
 model Subscription {
   id                    String             @id @default(uuid())
   
@@ -146,7 +138,6 @@ model Subscription {
   @@map("subscriptions")
 }
 
-// Renamed from Transactions to Transaction (singular)
 model Transaction {
   id                    String        @id @default(uuid())
   
@@ -178,7 +169,6 @@ model Transaction {
   @@map("transactions")
 }
 
-// Optional: Admin activity logging
 model Admin {
   id              String   @id @default(uuid())
   surname         String
