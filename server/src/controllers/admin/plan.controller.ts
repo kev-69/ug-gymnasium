@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import prisma from '../../config/database';
 import logger from '../../utils/logger';
-import { id } from 'zod/v4/locales';
 
 // Create Plan
 export const createPlan = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, description, price, durationInDays, targetRole, features, isActive } = req.body;
+    const { name, description, price, duration, targetRole, features, isActive } = req.body;
 
     // Check if plan with same name exists
     const existingPlan = await prisma.plan.findFirst({
@@ -27,7 +26,7 @@ export const createPlan = async (req: Request, res: Response): Promise<void> => 
         name,
         description,
         price,
-        duration: durationInDays,
+        duration,
         targetRole,
         features,
         isActive: isActive !== undefined ? isActive : true,
