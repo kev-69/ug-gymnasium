@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { hashPassword, comparePassword } from '../../utils/password';
-import { generateTokenPair, verifyRefreshToken } from '../../utils/jwt';
+import { generateAdminTokenPair, verifyAdminAccessToken,  } from '../../utils/jwt';
 import prisma from '../../config/database';
 import logger from '../../utils/logger';
-import { UserRole } from '@prisma/client';
 
 // Admin Signup (Temporary - will be removed later)
 export const adminSignup = async (req: Request, res: Response): Promise<void> => {
@@ -51,10 +50,10 @@ export const adminSignup = async (req: Request, res: Response): Promise<void> =>
     });
 
     // Generate tokens
-    const tokens = generateTokenPair({
+    const tokens = generateAdminTokenPair({
       userId: admin.id,
       email: admin.email,
-      role: UserRole.ADMIN,
+      role: 'ADMIN',
     });
 
     logger.info(`Admin registered successfully: ${admin.email}`);
@@ -106,10 +105,10 @@ export const adminLogin = async (req: Request, res: Response): Promise<void> => 
     }
 
     // Generate tokens
-    const tokens = generateTokenPair({
+    const tokens = generateAdminTokenPair({
       userId: admin.id,
       email: admin.email,
-      role: UserRole.ADMIN,
+      role: 'ADMIN',
     });
 
     logger.info(`Admin logged in: ${admin.email}`);
@@ -155,7 +154,7 @@ export const adminRefreshToken = async (req: Request, res: Response): Promise<vo
     // Verify refresh token
     let decoded;
     try {
-      decoded = verifyRefreshToken(refreshToken);
+      decoded = verifyAdminAccessToken(refreshToken);
     } catch (error) {
       logger.error('Admin Refresh Token Verification Error:', error);
       res.status(401).json({
@@ -179,10 +178,10 @@ export const adminRefreshToken = async (req: Request, res: Response): Promise<vo
     }
 
     // Generate new token pair
-    const tokens = generateTokenPair({
+    const tokens = generateAdminTokenPair({
       userId: admin.id,
       email: admin.email,
-      role: UserRole.ADMIN,
+      role: 'ADMIN',
     });
 
     logger.info(`Admin token refreshed: ${admin.email}`);
