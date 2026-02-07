@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken } from '../utils/jwt';
+import { verifyAccessToken, verifyAdminAccessToken } from '../utils/jwt';
 import { UserRole } from '@prisma/client';
 
 // Extend Express Request to include user
@@ -15,9 +15,58 @@ declare global {
   }
 }
 
+declare global {
+  namespace Express {
+    interface Request {
+      admin?: {
+        userId: string;
+        email: string;
+        role: 'ADMIN' ;
+      };
+    }
+  }
+}
+
 /**
  * Middleware to verify JWT token and attach user to request
  */
+export const authenticateAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({
+        success: false,
+        message: 'No token provided. Authorization header must be in format: Bearer <token>',
+      });
+      return;
+    }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+
+    try {
+      const decoded = verifyAdminAccessToken(token);
+      req.admin = decoded;
+      next();
+    } catch (error) {
+      res.status(401).json({
+        success: false,
+        message: 'Invalid or expired token',
+      });
+      return;
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Authentication error',
+    });
+    return;
+  }
+};
 export const authenticate = async (
   req: Request,
   res: Response,
