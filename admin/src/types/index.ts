@@ -107,6 +107,8 @@ export interface Transaction {
   createdAt: string;
   updatedAt: string;
   subscription?: Subscription;
+  user: User;
+  plan: Plan;
 }
 
 export interface AuthResponse {
