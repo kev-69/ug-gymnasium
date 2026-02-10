@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import type { Plan, User, Transaction } from '../types';
 import { formatCurrency } from '../utils/helpers';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, CreditCard, Receipt, DollarSign, ArrowRight, Loader2 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
@@ -47,74 +50,97 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const statCards = [
-    { label: 'Total Users', value: stats.totalUsers, icon: '👥', color: 'blue' },
-    { label: 'Active Plans', value: stats.totalPlans, icon: '📋', color: 'green' },
-    { label: 'Transactions', value: stats.totalTransactions, icon: '💰', color:'purple' },
-    { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue), icon: '💵', color: 'yellow' },
+    { label: 'Total Users', value: stats.totalUsers, icon: Users, color: 'text-blue-600 dark:text-blue-400' },
+    { label: 'Active Plans', value: stats.totalPlans, icon: CreditCard, color: 'text-green-600 dark:text-green-400' },
+    { label: 'Transactions', value: stats.totalTransactions, icon: Receipt, color:'text-purple-600 dark:text-purple-400' },
+    { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue), icon: DollarSign, color: 'text-yellow-600 dark:text-yellow-400' },
+  ];
+
+  const quickActions = [
+    { 
+      href: '/plans', 
+      icon: CreditCard, 
+      title: 'Manage Plans', 
+      description: 'Create and edit subscription plans',
+      color: 'hover:border-blue-500 dark:hover:border-blue-400'
+    },
+    { 
+      href: '/users', 
+      icon: Users, 
+      title: 'View Users', 
+      description: 'Browse all registered users',
+      color: 'hover:border-green-500 dark:hover:border-green-400'
+    },
+    { 
+      href: '/transactions', 
+      icon: Receipt, 
+      title: 'Transactions', 
+      description: 'View payment history',
+      color: 'hover:border-purple-500 dark:hover:border-purple-400'
+    },
   ];
 
   if (stats.loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Overview of your gym management system</p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground mt-2">Overview of your gym management system</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-white rounded-lg shadow-md p-6 border-l-4"
-            style={{ borderLeftColor: `var(--color-${stat.color}-500, #3B82F6)` }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 font-medium">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
-              </div>
-              <div className="text-4xl">{stat.icon}</div>
-            </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {statCards.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={stat.label}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {stat.label}
+                </CardTitle>
+                <Icon className={`h-5 w-5 ${stat.color}`} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+          <CardDescription>Manage your gym operations efficiently</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-3">
+            {quickActions.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.href}
+                  to={action.href}
+                  className={`group relative overflow-hidden rounded-lg border p-6 transition-all hover:shadow-md ${action.color}`}
+                >
+                  <div className="flex items-start justify-between">
+                    <Icon className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <h3 className="font-semibold mt-4">{action.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
+                </Link>
+              );
+            })}
           </div>
-        ))}
-      </div>
-
-      <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a
-            href="/plans"
-            className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
-          >
-            <div className="text-2xl mb-2">📋</div>
-            <h3 className="font-semibold text-gray-900">Manage Plans</h3>
-            <p className="text-sm text-gray-600 mt-1">Create and edit subscription plans</p>
-          </a>
-          <a
-            href="/users"
-            className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
-          >
-            <div className="text-2xl mb-2">👥</div>
-            <h3 className="font-semibold text-gray-900">View Users</h3>
-            <p className="text-sm text-gray-600 mt-1">Browse all registered users</p>
-          </a>
-          <a
-            href="/transactions"
-            className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
-          >
-            <div className="text-2xl mb-2">💰</div>
-            <h3 className="font-semibold text-gray-900">Transactions</h3>
-            <p className="text-sm text-gray-600 mt-1">View payment history</p>
-          </a>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
