@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import type { Transaction } from '../types';
-import { PaymentStatus } from '../types';
-import { formatCurrency, formatDateTime, getStatusColor } from '../utils/helpers';
+import { formatCurrency, formatDateTime } from '../utils/helpers';
 import toast from 'react-hot-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { DollarSign, Receipt, CheckCircle, Loader2 } from 'lucide-react';
 
 const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   useEffect(() => {
     fetchTransactions();
   }, []);
-
-  useEffect(() => {
-    filterTransactions();
-  }, [transactions, statusFilter]);
 
   const fetchTransactions = async () => {
     try {
@@ -30,141 +28,163 @@ const Transactions: React.FC = () => {
     }
   };
 
-  const filterTransactions = () => {
-    let filtered = [...transactions];
+  const filteredTransactions = transactions.filter((transaction) => {
+    return statusFilter === 'ALL' || transaction.paymentStatus === statusFilter;
+  });
 
-    if (statusFilter !== 'ALL') {
-      filtered = filtered.filter((txn) => txn.paymentStatus === statusFilter);
-    }
-
-    setFilteredTransactions(filtered);
+  const stats = {
+    totalRevenue: transactions
+      .filter((t) => t.paymentStatus === 'COMPLETED')
+      .reduce((sum, t) => sum + t.amount, 0),
+    totalTransactions: transactions.length,
+    completedTransactions: transactions.filter((t) => t.paymentStatus === 'COMPLETED').length,
   };
 
-  const totalRevenue = filteredTransactions
-    .filter((txn) => txn.paymentStatus === PaymentStatus.COMPLETED)
-    .reduce((sum, txn) => sum + txn.amount, 0);
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'COMPLETED':
+        return 'success';
+      case 'PENDING':
+        return 'warning';
+      case 'FAILED':
+        return 'destructive';
+      default:
+        return 'outline';
+    }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
-        <p className="text-gray-600 mt-2">View all payment transactions</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
+        <p className="text-muted-foreground mt-2">View payment transactions and history</p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <p className="text-sm text-gray-600 font-medium">Total Revenue</p>
-          <p className="text-2xl font-bold text-green-600 mt-2">{formatCurrency(totalRevenue)}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <p className="text-sm text-gray-600 font-medium">Total Transactions</p>
-          <p className="text-2xl font-bold text-blue-600 mt-2">{filteredTransactions.length}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <p className="text-sm text-gray-600 font-medium">Completed</p>
-          <p className="text-2xl font-bold text-purple-600 mt-2">
-            {filteredTransactions.filter((t) => t.paymentStatus === PaymentStatus.COMPLETED).length}
-          </p>
-        </div>
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
+            <Receipt className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalTransactions}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completed</CardTitle>
+            <CheckCircle className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.completedTransactions}</div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex justify-between items-center">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-          >
-            <option value="ALL">All Status</option>
-            <option value={PaymentStatus.COMPLETED}>Completed</option>
-            <option value={PaymentStatus.PENDING}>Pending</option>
-            <option value={PaymentStatus.FAILED}>Failed</option>
-          </select>
-        </div>
-
-        <div className="text-sm text-gray-600">
-          Showing <span className="font-semibold">{filteredTransactions.length}</span> of{' '}
-          <span className="font-semibold">{transactions.length}</span> transactions
-        </div>
-      </div>
-
-      {/* Transactions Table */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reference</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredTransactions.map((txn) => (
-                <tr key={txn.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-mono text-gray-900">{txn.paymentReference}</div>
-                    {txn.paystackReference && (
-                      <div className="text-xs text-gray-500">PSK: {txn.paystackReference}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {txn.subscription?.user ? (
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {txn.subscription.user.surname} {txn.subscription.user.otherNames}
-                        </div>
-                        <div className="text-xs text-gray-500">{txn.subscription.user.email}</div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Transaction History</CardTitle>
+              <CardDescription>
+                {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}
+              </CardDescription>
+            </div>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="ALL">All Status</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="PENDING">Pending</option>
+              <option value="FAILED">Failed</option>
+            </select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Reference</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Plan</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Method</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredTransactions.map((transaction) => (
+                <TableRow key={transaction.id}>
+                  <TableCell className="font-mono text-sm">
+                    {transaction.paymentReference}
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">
+                        {transaction.user.surname} {transaction.user.otherNames}
                       </div>
-                    ) : (
-                      <span className="text-sm text-gray-400">N/A</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {txn.subscription?.plan ? (
-                      <div className="text-sm text-gray-900">{txn.subscription.plan.name}</div>
-                    ) : (
-                      <span className="text-sm text-gray-400">N/A</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{formatCurrency(txn.amount)}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-600">{txn.paymentMethod}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(txn.paymentStatus)}`}>
-                      {txn.paymentStatus}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-600">{formatDateTime(txn.createdAt)}</div>
-                    {txn.paidAt && (
-                      <div className="text-xs text-gray-500">Paid: {formatDateTime(txn.paidAt)}</div>
-                    )}
-                  </td>
-                </tr>
+                      <div className="text-sm text-muted-foreground">
+                        {transaction.user.email}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{transaction.plan.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {transaction.plan.duration} days
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {formatCurrency(transaction.amount)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{transaction.paymentMethod}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusVariant(transaction.paymentStatus)}>
+                      {transaction.paymentStatus}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {formatDateTime(transaction.createdAt)}
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              {filteredTransactions.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    No transactions found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
