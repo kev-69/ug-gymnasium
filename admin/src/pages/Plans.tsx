@@ -2,8 +2,16 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import type { Plan } from '../types';
 import { UserRole } from '../types';
-import { formatCurrency, getStatusColor } from '../utils/helpers';
+import { formatCurrency } from '../utils/helpers';
 import toast from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import{ Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Edit, Trash2, Check, Loader2 } from 'lucide-react';
 
 const Plans: React.FC = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -131,211 +139,210 @@ const Plans: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Plans Management</h1>
-          <p className="text-gray-600 mt-2">Manage gym subscription plans</p>
+          <h1 className="text-3xl font-bold tracking-tight">Plans Management</h1>
+          <p className="text-muted-foreground mt-2">Manage gym subscription plans</p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-        >
-          + Create Plan
-        </button>
+        <Button onClick={() => openModal()}>
+          <Plus className="mr-2 h-4 w-4" />
+          Create Plan
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {plans.map((plan) => (
-          <div key={plan.id} className="bg-white rounded-lg shadow-md p-6 border-t-4 border-blue-500">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
-                <p className="text-sm text-gray-500">{plan.targetRole}</p>
+          <Card key={plan.id} className="flex flex-col">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <CardTitle>{plan.name}</CardTitle>
+                  <CardDescription>{plan.targetRole}</CardDescription>
+                </div>
+                <Badge variant={plan.isActive ? 'success' : 'destructive'}>
+                  {plan.isActive ? 'Active' : 'Inactive'}
+                </Badge>
               </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(plan.isActive ? 'ACTIVE' : 'EXPIRED')}`}>
-                {plan.isActive ? 'Active' : 'Inactive'}
-              </span>
-            </div>
+            </CardHeader>
+            <CardContent className="flex-1">
+              <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
+              
+              <div className="mb-4">
+                <div className="text-3xl font-bold text-primary">{formatCurrency(plan.price)}</div>
+                <div className="text-sm text-muted-foreground">{plan.duration} days</div>
+              </div>
 
-            <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
-
-            <div className="mb-4">
-              <div className="text-3xl font-bold text-blue-600">{formatCurrency(plan.price)}</div>
-              <div className="text-sm text-gray-500">{plan.duration} day (s)</div>
-            </div>
-
-            <div className="mb-4">
-              <h4 className="text-sm font-semibold text-gray-700 mb-2">Features:</h4>
-              <ul className="space-y-1">
-                {plan.features.map((feature, idx) => (
-                  <li key={idx} className="text-sm text-gray-600 flex items-start">
-                    <span className="mr-2">✓</span>
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex space-x-2 pt-4 border-t">
-              <button
+              <div>
+                <h4 className="text-sm font-semibold mb-2">Features:</h4>
+                <ul className="space-y-1">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="text-sm flex items-start gap-2">
+                      <Check className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+            <CardFooter className="gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
                 onClick={() => openModal(plan)}
-                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition text-sm font-medium"
               >
+                <Edit className="mr-2 h-4 w-4" />
                 Edit
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
                 onClick={() => handleDelete(plan.id)}
-                className="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100 transition text-sm font-medium"
               >
+                <Trash2 className="mr-2 h-4 w-4" />
                 Delete
-              </button>
-            </div>
-          </div>
+              </Button>
+            </CardFooter>
+          </Card>
         ))}
       </div>
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b">
-              <h2 className="text-2xl font-bold text-gray-900">
-                {editingPlan ? 'Edit Plan' : 'Create New Plan'}
-              </h2>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editingPlan ? 'Edit Plan' : 'Create New Plan'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingPlan ? 'Update plan details' : 'Add a new subscription plan'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Plan Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="targetRole">Target Role</Label>
+                <select
+                  id="targetRole"
+                  value={formData.targetRole}
+                  onChange={(e) => setFormData({ ...formData, targetRole: e.target.value as UserRole })}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value={UserRole.STUDENT}>STUDENT</option>
+                  <option value={UserRole.STAFF}>STAFF</option>
+                  <option value={UserRole.PUBLIC}>PUBLIC</option>
+                </select>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Plan Name</label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+              />
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Role</label>
-                  <select
-                    value={formData.targetRole}
-                    onChange={(e) => setFormData({ ...formData, targetRole: e.target.value as UserRole })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  >
-                    <option value={UserRole.STUDENT}>STUDENT</option>
-                    <option value={UserRole.STAFF}>STAFF</option>
-                    <option value={UserRole.PUBLIC}>PUBLIC</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  rows={3}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="price">Price (GH₵)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price (GH₵)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    required
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Duration (days)</label>
-                  <input
-                    type="number"
-                    value={formData.duration}
-                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    required
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Features</label>
-                {formData.features.map((feature, index) => (
-                  <div key={index} className="flex space-x-2 mb-2">
-                    <input
-                      type="text"
-                      value={feature}
-                      onChange={(e) => updateFeature(index, e.target.value)}
-                      className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                      placeholder="Enter feature"
-                    />
-                    {formData.features.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeFeature(index)}
-                        className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addFeature}
-                  className="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm"
-                >
-                  + Add Feature
-                </button>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              <div className="space-y-2">
+                <Label htmlFor="duration">Duration (days)</Label>
+                <Input
+                  id="duration"
+                  type="number"
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                  required
                 />
-                <label htmlFor="isActive" className="ml-2 text-sm text-gray-700">
-                  Active Plan
-                </label>
               </div>
+            </div>
 
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  {editingPlan ? 'Update Plan' : 'Create Plan'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="space-y-2">
+              <Label>Features</Label>
+              {formData.features.map((feature, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={feature}
+                    onChange={(e) => updateFeature(index, e.target.value)}
+                    placeholder="Enter feature"
+                  />
+                  {formData.features.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => removeFeature(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addFeature}
+                className="w-full"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Feature
+              </Button>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={formData.isActive}
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <Label htmlFor="isActive" className="cursor-pointer">
+                Active Plan
+              </Label>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={closeModal}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                {editingPlan ? 'Update Plan' : 'Create Plan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
