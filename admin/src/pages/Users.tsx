@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import type { User } from '../types';
 import { UserRole } from '../types';
-import { formatDateTime } from '../utils/helpers';
 import toast from 'react-hot-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
+import { UsersTable } from '@/components/UsersTable';
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -87,51 +85,7 @@ const Users: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>ID Number</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Joined</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">
-                    {user.surname} {user.otherNames}
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{user.role}</Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {user.studentId || user.staffId || '-'}
-                  </TableCell>
-                  <TableCell>{user.phone || '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant={user.isActive ? 'success' : 'destructive'}>
-                      {user.isActive ? 'ACTIVE' : 'INACTIVE'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {formatDateTime(user.createdAt)}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredUsers.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                    No users found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+          <UsersTable users={filteredUsers} />
         </CardContent>
       </Card>
     </div>
