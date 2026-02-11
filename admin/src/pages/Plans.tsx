@@ -6,12 +6,9 @@ import { formatCurrency } from '../utils/helpers';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import{ Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Check, Loader2 } from 'lucide-react';
+import { PlanFormDialog } from '@/components/PlanFormDialog';
 
 const Plans: React.FC = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -121,21 +118,6 @@ const Plans: React.FC = () => {
     setEditingPlan(null);
   };
 
-  const updateFeature = (index: number, value: string) => {
-    const newFeatures = [...formData.features];
-    newFeatures[index] = value;
-    setFormData({ ...formData, features: newFeatures });
-  };
-
-  const addFeature = () => {
-    setFormData({ ...formData, features: [...formData.features, ''] });
-  };
-
-  const removeFeature = (index: number) => {
-    const newFeatures = formData.features.filter((_, i) => i !== index);
-    setFormData({ ...formData, features: newFeatures });
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -184,7 +166,7 @@ const Plans: React.FC = () => {
                 <ul className="space-y-1">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="text-sm flex items-start gap-2">
-                      <Check className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                      <Check className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -213,136 +195,15 @@ const Plans: React.FC = () => {
         ))}
       </div>
 
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editingPlan ? 'Edit Plan' : 'Create New Plan'}
-            </DialogTitle>
-            <DialogDescription>
-              {editingPlan ? 'Update plan details' : 'Add a new subscription plan'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Plan Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="targetRole">Target Role</Label>
-                <select
-                  id="targetRole"
-                  value={formData.targetRole}
-                  onChange={(e) => setFormData({ ...formData, targetRole: e.target.value as UserRole })}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <option value={UserRole.STUDENT}>STUDENT</option>
-                  <option value={UserRole.STAFF}>STAFF</option>
-                  <option value={UserRole.PUBLIC}>PUBLIC</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (GH₵)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration (days)</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  value={formData.duration}
-                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Features</Label>
-              {formData.features.map((feature, index) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    value={feature}
-                    onChange={(e) => updateFeature(index, e.target.value)}
-                    placeholder="Enter feature"
-                  />
-                  {formData.features.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeFeature(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addFeature}
-                className="w-full"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Feature
-              </Button>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={formData.isActive}
-                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <Label htmlFor="isActive" className="cursor-pointer">
-                Active Plan
-              </Label>
-            </div>
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={closeModal}>
-                Cancel
-              </Button>
-              <Button type="submit">
-                {editingPlan ? 'Update Plan' : 'Create Plan'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <PlanFormDialog
+        open={showModal}
+        onOpenChange={setShowModal}
+        editingPlan={editingPlan}
+        formData={formData}
+        setFormData={setFormData}
+        onSubmit={handleSubmit}
+        onClose={closeModal}
+      />
     </div>
   );
 };
