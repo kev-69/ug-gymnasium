@@ -3,12 +3,15 @@ import type { User } from '@/types';
 import { formatDateTime } from '@/utils/helpers';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Eye } from 'lucide-react';
 
 interface UsersTableProps {
   users: User[];
+  onViewUser: (user: User) => void;
 }
 
-export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+export const UsersTable: React.FC<UsersTableProps> = ({ users, onViewUser }) => {
   return (
     <Table>
       <TableHeader>
@@ -20,6 +23,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
           <TableHead>Phone</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Joined</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -44,11 +48,20 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
             <TableCell className="text-muted-foreground">
               {formatDateTime(user.createdAt)}
             </TableCell>
+            <TableCell className="text-right">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onViewUser(user)}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
         {users.length === 0 && (
           <TableRow>
-            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+            <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
               No users found
             </TableCell>
           </TableRow>
