@@ -3,9 +3,12 @@ import type { Transaction } from '@/types';
 import { formatCurrency, formatDateTime } from '@/utils/helpers';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Eye } from 'lucide-react';
 
 interface TransactionsTableProps {
   transactions: Transaction[];
+  onViewTransaction: (transaction: Transaction) => void;
 }
 
 const getStatusVariant = (status: string) => {
@@ -21,7 +24,10 @@ const getStatusVariant = (status: string) => {
   }
 };
 
-export const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions }) => {
+export const TransactionsTable: React.FC<TransactionsTableProps> = ({ 
+  transactions,
+  onViewTransaction 
+}) => {
   return (
     <Table>
       <TableHeader>
@@ -33,6 +39,7 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactio
           <TableHead>Method</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Date</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -73,11 +80,20 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactio
             <TableCell className="text-muted-foreground">
               {formatDateTime(transaction.createdAt)}
             </TableCell>
+            <TableCell className="text-right">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onViewTransaction(transaction)}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
         {transactions.length === 0 && (
           <TableRow>
-            <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+            <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
               No transactions found
             </TableCell>
           </TableRow>
