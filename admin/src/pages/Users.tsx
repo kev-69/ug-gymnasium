@@ -4,14 +4,19 @@ import type { User } from '../types';
 import { UserRole } from '../types';
 import toast from 'react-hot-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, Search } from 'lucide-react';
 import { UsersTable } from '@/components/UsersTable';
+import { UserDetailsDialog } from '@/components/UserDetailsDialog';
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -28,13 +33,26 @@ const Users: React.FC = () => {
     }
   };
 
+  const handleViewUser = (user: User) => {
+    setSelectedUser(user);
+    setIsDetailsDialogOpen(true);
+  };
+
   const filteredUsers = users.filter((user) => {
     const roleMatch = roleFilter === 'ALL' || user.role === roleFilter;
     const statusMatch =
       statusFilter === 'ALL' ||
       (statusFilter === 'ACTIVE' && user.isActive) ||
       (statusFilter === 'INACTIVE' && !user.isActive);
-    return roleMatch && statusMatch;
+    
+    const searchMatch = searchQuery === '' ||
+      user.surname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.otherNames.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.studentId && user.studentId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (user.staffId && user.staffId.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return roleMatch && statusMatch && searchMatch;
   });
 
   if (loading) {
@@ -54,14 +72,15 @@ const Users: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>All Users</CardTitle>
-              <CardDescription>
-                {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''} found
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>All Users</CardTitle>
+                <CardDescription>
+                  {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''} found
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
@@ -81,13 +100,30 @@ const Users: React.FC = () => {
                 <option value="ACTIVE">Active</option>
                 <option value="INACTIVE">Inactive</option>
               </select>
+              </div>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by name, email, or ID number..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <UsersTable users={filteredUsers} />
+          <UsersTable users={filteredUsers} onViewUser={handleViewUser} />
         </CardContent>
       </Card>
+
+      <UserDetailsDialog
+        user={selectedUser}
+        open={isDetailsDialogOpen}
+        onOpenChange={setIsDetailsDialogOpen}
+      />
     </div>
   );
 };
