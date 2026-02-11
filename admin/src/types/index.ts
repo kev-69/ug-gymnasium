@@ -63,6 +63,9 @@ export interface User {
   residence?: boolean;
   hallOfResidence?: string | null;
   isActive: boolean;
+  _count: {
+    subscriptions: number;
+  };
   createdAt: string;
   updatedAt: string;
 }
