@@ -44,18 +44,18 @@ export const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactio
             <TableCell>
               <div>
                 <div className="font-medium">
-                  {transaction.user.surname} {transaction.user.otherNames}
+                  {transaction.subscription.user.surname} {transaction.subscription.user.otherNames}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {transaction.user.email}
+                  {transaction.subscription.user.email}
                 </div>
               </div>
             </TableCell>
             <TableCell>
               <div>
-                <div className="font-medium">{transaction.plan.name}</div>
+                <div className="font-medium">{transaction.subscription.plan.name}</div>
                 <div className="text-sm text-muted-foreground">
-                  {transaction.plan.duration} days
+                  {transaction.subscription.plan.duration} days
                 </div>
               </div>
             </TableCell>
