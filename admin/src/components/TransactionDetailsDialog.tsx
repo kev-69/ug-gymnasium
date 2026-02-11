@@ -32,34 +32,6 @@ export const TransactionDetailsDialog: React.FC<TransactionDetailsDialogProps> =
 }) => {
   if (!transaction) return null;
 
-  const renderMetadata = (metadata: any) => {
-    if (!metadata) return <p className="text-sm text-muted-foreground">No metadata available</p>;
-
-    try {
-      const data = typeof metadata === 'string' ? JSON.parse(metadata) : metadata;
-      return (
-        <div className="space-y-2">
-          {Object.entries(data).map(([key, value]) => (
-            <div key={key} className="flex justify-between py-2 border-b last:border-0">
-              <span className="text-sm font-medium capitalize">
-                {key.replace(/_/g, ' ')}:
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
-              </span>
-            </div>
-          ))}
-        </div>
-      );
-    } catch (e) {
-      return (
-        <pre className="text-xs bg-muted p-3 rounded-md overflow-auto max-h-40">
-          {JSON.stringify(metadata, null, 2)}
-        </pre>
-      );
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
