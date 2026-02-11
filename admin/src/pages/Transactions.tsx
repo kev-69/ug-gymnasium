@@ -6,11 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2 } from 'lucide-react';
 import { TransactionStats } from '@/components/TransactionStats';
 import { TransactionsTable } from '@/components/TransactionsTable';
+import { TransactionDetailsDialog } from '@/components/TransactionDetailsDialog';
 
 const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchTransactions();
@@ -25,6 +28,11 @@ const Transactions: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsDetailsDialogOpen(true);
   };
 
   const filteredTransactions = transactions.filter((transaction) => {
@@ -82,9 +90,18 @@ const Transactions: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <TransactionsTable transactions={filteredTransactions} />
+          <TransactionsTable 
+            transactions={filteredTransactions} 
+            onViewTransaction={handleViewTransaction}
+          />
         </CardContent>
       </Card>
+
+      <TransactionDetailsDialog
+        transaction={selectedTransaction}
+        open={isDetailsDialogOpen}
+        onOpenChange={setIsDetailsDialogOpen}
+      />
     </div>
   );
 };
