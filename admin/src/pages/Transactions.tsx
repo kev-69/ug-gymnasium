@@ -3,7 +3,8 @@ import api from '../services/api';
 import type { Transaction } from '../types';
 import toast from 'react-hot-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, Search } from 'lucide-react';
 import { TransactionStats } from '@/components/TransactionStats';
 import { TransactionsTable } from '@/components/TransactionsTable';
 import { TransactionDetailsDialog } from '@/components/modals/TransactionDetailsDialog';
@@ -12,6 +13,7 @@ const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
@@ -36,7 +38,17 @@ const Transactions: React.FC = () => {
   };
 
   const filteredTransactions = transactions.filter((transaction) => {
-    return statusFilter === 'ALL' || transaction.paymentStatus === statusFilter;
+    const statusMatch = statusFilter === 'ALL' || transaction.paymentStatus === statusFilter;
+    
+    const searchMatch = searchQuery === '' ||
+      transaction.paymentReference.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (transaction.paystackReference && transaction.paystackReference.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      transaction.subscription.user.surname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.subscription.user.otherNames.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.subscription.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.subscription.plan.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return statusMatch && searchMatch;
   });
 
   const stats = {
@@ -70,23 +82,35 @@ const Transactions: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Transaction History</CardTitle>
-              <CardDescription>
-                {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}
-              </CardDescription>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Transaction History</CardTitle>
+                <CardDescription>
+                  {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? 's' : ''}
+                </CardDescription>
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <option value="ALL">All Status</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="PENDING">Pending</option>
+                <option value="FAILED">Failed</option>
+              </select>
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="ALL">All Status</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="PENDING">Pending</option>
-              <option value="FAILED">Failed</option>
-            </select>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by reference, user, email, or plan..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
