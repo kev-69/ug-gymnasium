@@ -7,15 +7,15 @@ export const createPlan = async (req: Request, res: Response): Promise<void> => 
   try {
     const { name, description, price, duration, targetRole, features, isActive } = req.body;
 
-    // Check if plan with same name exists
+    // Check if plan with same name exists for same role
     const existingPlan = await prisma.plan.findFirst({
-      where: { name },
+      where: { name, targetRole },
     });
 
     if (existingPlan) {
       res.status(400).json({
         success: false,
-        message: 'Plan with this name already exists',
+        message: 'Plan with this name already exists for this role',
       });
       return;
     }
