@@ -94,6 +94,7 @@ export interface Subscription {
   updatedAt: string;
   user?: User;
   plan?: Plan;
+  transaction?: Transaction;
 }
 
 export interface Transaction {
