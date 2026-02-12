@@ -3,7 +3,8 @@ import api from '../services/api';
 import type { Subscription } from '../types';
 import toast from 'react-hot-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Users, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Loader2, Users, CheckCircle, XCircle, Clock, Search } from 'lucide-react';
 import { SubscriptionsTable } from '@/components/SubscriptionsTable';
 import { SubscriptionDetailsDialog } from '@/components/modals/SubscriptionDetailsDialog';
 
@@ -12,6 +13,7 @@ const Subscriptions: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [subscriptionStatusFilter, setSubscriptionStatusFilter] = useState<string>('ALL');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [stats, setStats] = useState({
@@ -60,7 +62,16 @@ const Subscriptions: React.FC = () => {
   const filteredSubscriptions = subscriptions.filter((subscription) => {
     const subscriptionMatch = subscriptionStatusFilter === 'ALL' || subscription.subscriptionStatus === subscriptionStatusFilter;
     const paymentMatch = paymentStatusFilter === 'ALL' || subscription.paymentStatus === paymentStatusFilter;
-    return subscriptionMatch && paymentMatch;
+    
+    const searchMatch = searchQuery === '' ||
+      (subscription.user?.surname && subscription.user.surname.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (subscription.user?.otherNames && subscription.user.otherNames.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (subscription.user?.email && subscription.user.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (subscription.user?.studentId && subscription.user.studentId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (subscription.user?.staffId && subscription.user.staffId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (subscription.plan?.name && subscription.plan.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return subscriptionMatch && paymentMatch && searchMatch;
   });
 
   if (loading) {
@@ -133,35 +144,47 @@ const Subscriptions: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>All Subscriptions</CardTitle>
-              <CardDescription>
-                {filteredSubscriptions.length} subscription{filteredSubscriptions.length !== 1 ? 's' : ''}
-              </CardDescription>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>All Subscriptions</CardTitle>
+                <CardDescription>
+                  {filteredSubscriptions.length} subscription{filteredSubscriptions.length !== 1 ? 's' : ''}
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <select
+                  value={subscriptionStatusFilter}
+                  onChange={(e) => setSubscriptionStatusFilter(e.target.value)}
+                  className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="EXPIRED">Expired</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+                <select
+                  value={paymentStatusFilter}
+                  onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                  className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="ALL">All Payments</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="FAILED">Failed</option>
+                </select>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <select
-                value={subscriptionStatusFilter}
-                onChange={(e) => setSubscriptionStatusFilter(e.target.value)}
-                className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active</option>
-                <option value="PENDING">Pending</option>
-                <option value="EXPIRED">Expired</option>
-                <option value="CANCELLED">Cancelled</option>
-              </select>
-              <select
-                value={paymentStatusFilter}
-                onChange={(e) => setPaymentStatusFilter(e.target.value)}
-                className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                <option value="ALL">All Payments</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="PENDING">Pending</option>
-                <option value="FAILED">Failed</option>
-              </select>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by user name, email, ID, or plan..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
             </div>
           </div>
         </CardHeader>
