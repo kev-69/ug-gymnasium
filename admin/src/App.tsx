@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Plans from './pages/Plans';
 import Users from './pages/Users';
+import Subscriptions from './pages/Subscriptions';
 import Transactions from './pages/Transactions';
 
 function App() {
@@ -44,6 +45,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Users />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/subscriptions"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Subscriptions />
                   </Layout>
                 </ProtectedRoute>
               }
