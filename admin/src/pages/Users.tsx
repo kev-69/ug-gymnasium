@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Loader2, Search } from 'lucide-react';
 import { UsersTable } from '@/components/UsersTable';
-import { UserDetailsDialog } from '@/components/UserDetailsDialog';
+import { UserDetailsDialog } from '@/components/modals/UserDetailsDialog';
 
 const Users: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
