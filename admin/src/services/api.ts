@@ -73,11 +73,6 @@ class ApiService {
     return response.data;
   }
 
-  async signup(data: any) {
-    const response = await this.api.post('/admin/auth/signup', data);
-    return response.data;
-  }
-
   async getProfile() {
     const response = await this.api.get('/admin/auth/profile');
     return response.data;
@@ -128,6 +123,27 @@ class ApiService {
 
   async getTransaction(id: string) {
     const response = await this.api.get<ApiResponse>(`/admin/transactions/${id}`);
+    return response.data;
+  }
+
+  // Subscription endpoints
+  async getSubscriptions(params?: { subscriptionStatus?: string; paymentStatus?: string; userId?: string; planId?: string }) {
+    const response = await this.api.get<ApiResponse>('/admin/subscriptions', { params });
+    return response.data;
+  }
+
+  async getSubscription(id: string) {
+    const response = await this.api.get<ApiResponse>(`/admin/subscriptions/${id}`);
+    return response.data;
+  }
+
+  async updateSubscriptionStatus(id: string, subscriptionStatus: string) {
+    const response = await this.api.patch<ApiResponse>(`/admin/subscriptions/${id}/status`, { subscriptionStatus });
+    return response.data;
+  }
+
+  async getSubscriptionStats() {
+    const response = await this.api.get<ApiResponse>('/admin/subscriptions/stats');
     return response.data;
   }
 }
