@@ -7,7 +7,8 @@ import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Check, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Edit, Trash2, Check, Loader2, Search } from 'lucide-react';
 import { PlanFormDialog } from '@/components/modals/PlanFormDialog';
 
 const Plans: React.FC = () => {
@@ -15,6 +16,9 @@ const Plans: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('ALL');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
   const [formData, setFormData] = useState<{
     name: string;
@@ -118,6 +122,20 @@ const Plans: React.FC = () => {
     setEditingPlan(null);
   };
 
+  const filteredPlans = plans.filter((plan) => {
+    const roleMatch = roleFilter === 'ALL' || plan.targetRole === roleFilter;
+    const statusMatch =
+      statusFilter === 'ALL' ||
+      (statusFilter === 'ACTIVE' && plan.isActive) ||
+      (statusFilter === 'INACTIVE' && !plan.isActive);
+    
+    const searchMatch = searchQuery === '' ||
+      plan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (plan.description && plan.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return roleMatch && statusMatch && searchMatch;
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -139,8 +157,55 @@ const Plans: React.FC = () => {
         </Button>
       </div>
 
+      {/* Search and Filters */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>All Plans</CardTitle>
+                <CardDescription>
+                  {filteredPlans.length} plan{filteredPlans.length !== 1 ? 's' : ''} found
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value)}
+                  className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="ALL">All Roles</option>
+                  <option value={UserRole.STUDENT}>Students</option>
+                  <option value={UserRole.STAFF}>Staff</option>
+                  <option value={UserRole.PUBLIC}>Public</option>
+                </select>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="ALL">All Status</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+              </div>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search plans by name or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {plans.map((plan) => (
+        {filteredPlans.map((plan) => (
           <Card key={plan.id} className="flex flex-col">
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -158,7 +223,7 @@ const Plans: React.FC = () => {
               
               <div className="mb-4">
                 <div className="text-3xl font-bold text-primary">{formatCurrency(plan.price)}</div>
-                <div className="text-sm text-muted-foreground">{plan.duration} days</div>
+                <div className="text-sm text-muted-foreground">{plan.duration} day{plan.duration !== 1 ? 's' : ''}</div>
               </div>
 
               <div>
@@ -193,6 +258,12 @@ const Plans: React.FC = () => {
             </CardFooter>
           </Card>
         ))}
+        
+        {filteredPlans.length === 0 && (
+          <div className="col-span-full text-center py-12">
+            <p className="text-muted-foreground">No plans found matching your criteria</p>
+          </div>
+        )}
       </div>
 
       <PlanFormDialog
