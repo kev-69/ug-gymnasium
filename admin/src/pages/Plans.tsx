@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Check, Loader2 } from 'lucide-react';
-import { PlanFormDialog } from '@/components/PlanFormDialog';
+import { PlanFormDialog } from '@/components/modals/PlanFormDialog';
 
 const Plans: React.FC = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
