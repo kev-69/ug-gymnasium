@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2 } from 'lucide-react';
 import { TransactionStats } from '@/components/TransactionStats';
 import { TransactionsTable } from '@/components/TransactionsTable';
-import { TransactionDetailsDialog } from '@/components/TransactionDetailsDialog';
+import { TransactionDetailsDialog } from '@/components/modals/TransactionDetailsDialog';
 
 const Transactions: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
