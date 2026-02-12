@@ -8,6 +8,7 @@ import adminAuthRoutes from './routes/admin/auth.routes';
 import adminPlanRoutes from './routes/admin/plan.routes';
 import adminUserRoutes from './routes/admin/user.routes';
 import adminTransactionRoutes from './routes/admin/transaction.routes';
+import adminSubscriptionRoutes from './routes/admin/subscription.routes';
 import userPlanRoutes from './routes/user/plan.routes';
 import userSubscriptionRoutes from './routes/user/subscription.routes';
 import userPaymentRoutes from './routes/user/payment.routes';
@@ -52,6 +53,7 @@ app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/plans', adminPlanRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/transactions', adminTransactionRoutes);
+app.use('/api/admin/subscriptions', adminSubscriptionRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
@@ -82,6 +84,7 @@ app.listen(PORT, () => {
   logger.info(`👑 Admin Auth: /api/admin/auth`);
   logger.info(`📊 Admin Plans: /api/admin/plans`);
   logger.info(`👥 Admin Users: /api/admin/users`);
+  logger.info(`📋 Admin Subscriptions: /api/admin/subscriptions`);
   logger.info(`💸 Admin Transactions: /api/admin/transactions`);  
   // Start cron jobs
   startSubscriptionExpirationJob();});
