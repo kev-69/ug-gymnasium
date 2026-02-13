@@ -151,7 +151,10 @@ const Plans: React.FC = () => {
           <h1 className="text-3xl font-bold tracking-tight">Plans Management</h1>
           <p className="text-muted-foreground mt-2">Manage gym subscription plans</p>
         </div>
-        <Button onClick={() => openModal()}>
+        <Button 
+          variant="outline"
+          onClick={() => openModal()}
+        >
           <Plus className="mr-2 h-4 w-4" />
           Create Plan
         </Button>
@@ -204,9 +207,10 @@ const Plans: React.FC = () => {
         </CardHeader>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredPlans.map((plan) => (
-          <Card key={plan.id} className="flex flex-col">
+      <div className="max-h-[calc(100vh-320px)] overflow-y-auto">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredPlans.map((plan) => (
+            <Card key={plan.id} className="flex flex-col">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
@@ -248,8 +252,8 @@ const Plans: React.FC = () => {
                 Edit
               </Button>
               <Button
-                variant="destructive"
-                className="flex-1"
+                variant="outline"
+                className="flex-1 border-red-600 text-red-600 hover:bg-red-600 hover:text-white focus:ring-red-600"
                 onClick={() => handleDelete(plan.id)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -264,6 +268,7 @@ const Plans: React.FC = () => {
             <p className="text-muted-foreground">No plans found matching your criteria</p>
           </div>
         )}
+        </div>
       </div>
 
       <PlanFormDialog
