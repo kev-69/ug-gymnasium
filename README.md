@@ -72,14 +72,14 @@ cp .env.example .env
 
 Run each component in separate terminals:
 
-**Client (Port 5173):**
+**Client (Port 5174):**
 
 ```bash
 cd client
 npm run dev
 ```
 
-**Admin (Port 5174):**
+**Admin (Port 5173):**
 
 ```bash
 cd admin
