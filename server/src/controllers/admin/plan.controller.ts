@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../../config/database';
 import logger from '../../utils/logger';
+import { calculatePriceWithMarkup } from '../../config/constants';
 
 // Create Plan
 export const createPlan = async (req: Request, res: Response): Promise<void> => {
@@ -20,12 +21,15 @@ export const createPlan = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
+    // Calculate price with 5% developer markup
+    const priceWithMarkup = calculatePriceWithMarkup(price);
+
     // Create plan
     const plan = await prisma.plan.create({
       data: {
         name,
         description,
-        price,
+        price: priceWithMarkup,
         duration,
         targetRole,
         features,
@@ -159,6 +163,11 @@ export const updatePlan = async (req: Request, res: Response): Promise<void> => 
         });
         return;
       }
+    }
+
+    // If price is being updated, add developer markup
+    if (updateData.price !== undefined) {
+      updateData.price = calculatePriceWithMarkup(updateData.price);
     }
 
     // Update plan
