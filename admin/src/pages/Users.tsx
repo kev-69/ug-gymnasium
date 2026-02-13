@@ -114,8 +114,10 @@ const Users: React.FC = () => {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <UsersTable users={filteredUsers} onViewUser={handleViewUser} />
+        <CardContent className="p-0">
+          <div className="max-h-[calc(100vh-300px)] overflow-y-auto px-6 pb-6">
+            <UsersTable users={filteredUsers} onViewUser={handleViewUser} />
+          </div>
         </CardContent>
       </Card>
 
