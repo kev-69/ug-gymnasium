@@ -3,9 +3,11 @@ import prisma from '../../config/database';
 import logger from '../../utils/logger';
 import { PaymentStatus, SubscriptionStatus } from '@prisma/client';
 import axios from 'axios';
+import { calculateDeveloperShare, calculateBasePrice } from '../../config/constants';
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
+const PAYSTACK_DEVELOPER_SUBACCOUNT = process.env.PAYSTACK_DEVELOPER_SUBACCOUNT;
 
 // Initialize Payment
 export const initializePayment = async (req: Request, res: Response): Promise<void> => {
@@ -69,21 +71,54 @@ export const initializePayment = async (req: Request, res: Response): Promise<vo
 
     // For mobile money and card, initialize Paystack payment
     try {
+      // Calculate shares:
+      // - Client's share: Base price (95% of total, e.g., 100 from 105)
+      // - Developer's share: 5% markup (e.g., 5 from 105)
+      const clientShare = calculateBasePrice(transaction.amount);  // e.g., 100
+      const developerShare = calculateDeveloperShare(transaction.amount);  // e.g., 5
+      
+      // Calculate Paystack fees (user will pay these)
+      // Paystack charges: 1.5% + GHS 0.30 for local cards/mobile money
+      const paystackFeePercentage = 0.015; // 1.5%
+      const paystackFlatFee = 0.30; // GHS 0.30
+      const paystackFee = (transaction.amount * paystackFeePercentage) + paystackFlatFee;
+      
+      // Total amount user pays (plan price + fees)
+      const totalAmountWithFees = transaction.amount + paystackFee;
+      
+      // Client's share in kobo (what they take from the subaccount payment)
+      const transactionChargeInKobo = Math.round(clientShare * 100);
+
+      const paystackPayload: any = {
+        email: userEmail,
+        amount: Math.round(totalAmountWithFees * 100), // Convert to kobo/pesewas (includes fees)
+        reference: transaction.paymentReference,
+        callback_url: `${process.env.FRONTEND_URL}/payment/verify`,
+        metadata: {
+          transactionId: transaction.id,
+          subscriptionId: transaction.subscriptionId,
+          userId,
+          planName: transaction.subscription.plan.name,
+          planPrice: transaction.amount,
+          paystackFee: paystackFee,
+          totalAmount: totalAmountWithFees,
+          clientShare: clientShare,
+          developerShare: developerShare,
+        },
+        channels: paymentMethod === 'MOBILE_MONEY' ? ['mobile_money'] : ['card'],
+      };
+
+      // Add split payment configuration if subaccount is configured
+      // Flow: Full payment (105 + fees) → Developer subaccount → Client takes their share (100) → Developer keeps (5)
+      if (PAYSTACK_DEVELOPER_SUBACCOUNT) {
+        paystackPayload.subaccount = PAYSTACK_DEVELOPER_SUBACCOUNT;
+        paystackPayload.transaction_charge = transactionChargeInKobo; // Amount client takes (in kobo)
+        paystackPayload.bearer = 'subaccount'; // Customer bears the Paystack transaction fee
+      }
+
       const paystackResponse = await axios.post(
         `${PAYSTACK_BASE_URL}/transaction/initialize`,
-        {
-          email: userEmail,
-          amount: Math.round(transaction.amount * 100), // Convert to kobo/pesewas
-          reference: transaction.paymentReference,
-          callback_url: `${process.env.FRONTEND_URL}/payment/verify`,
-          metadata: {
-            transactionId: transaction.id,
-            subscriptionId: transaction.subscriptionId,
-            userId,
-            planName: transaction.subscription.plan.name,
-          },
-          channels: paymentMethod === 'MOBILE_MONEY' ? ['mobile_money'] : ['card'],
-        },
+        paystackPayload,
         {
           headers: {
             Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
@@ -102,6 +137,9 @@ export const initializePayment = async (req: Request, res: Response): Promise<vo
             authorizationUrl: paystackResponse.data.data.authorization_url,
             accessCode: paystackResponse.data.data.access_code,
             reference: paystackResponse.data.data.reference,
+            planPrice: transaction.amount,
+            paystackFee: paystackFee,
+            totalAmount: totalAmountWithFees,
           },
         });
       } else {
