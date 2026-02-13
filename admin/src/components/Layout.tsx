@@ -94,10 +94,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <p className="text-xs text-muted-foreground truncate">{admin?.email}</p>
               </div>
               <Button
-                variant="destructive"
+                variant="outline"
                 size="sm"
                 onClick={handleLogout}
-                className="w-full"
+                className="w-full border-red-600 text-red-600 focus:ring-red-600"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
