@@ -37,26 +37,20 @@ const Home = () => {
     },
   ];
 
-  const benefits = [
-    'Access to all gym equipment and facilities',
-    'Free fitness assessment',
-    'Locker and shower facilities',
-    'Free Wi-Fi throughout the facility',
-    'Member-only events and workshops',
-    'Nutrition guidance and support',
-  ];
-
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 bg-linear-to-br from-primary/10 via-background to-background">
-        <div className="container mx-auto px-4">
+      <section className="relative py-20 md:py-32 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(https://res.cloudinary.com/dxykzipbv/image/upload/v1770987696/gym_building.wL6fsWV-_wevag3.jpg)' }}>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/60"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-8">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white">
               Transform Your Body,
               <span className="block text-primary">Elevate Your Mind</span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground">
+            <p className="text-lg md:text-xl text-white">
               Join UG Gymnasium and experience the best fitness facility on campus.
               Whether you're a student, staff member, or from the public, we have the perfect plan for you.
             </p>
@@ -68,7 +62,7 @@ const Home = () => {
                 </Button>
               </Link>
               <Link to="/plans">
-                <Button size="lg" variant="outline" className="text-base">
+                <Button size="lg" variant="secondary" className="text-base">
                   View Plans
                 </Button>
               </Link>
@@ -102,30 +96,53 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-20">
+      {/* Facilities Gallery Section */}
+      <section className="py-20 bg-muted/50">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Membership Benefits
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                When you join UG Gymnasium, you're not just getting a gym membership—you're
-                joining a community dedicated to health, wellness, and personal growth.
-              </p>
-              <ul className="space-y-4">
-                {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <Check className="h-6 w-6 text-primary shrink-0 mt-0.5" />
-                    <span className="text-base">{benefit}</span>
-                  </li>
-                ))}
-              </ul>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Facilities</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Explore our state-of-the-art equipment and spacious workout areas designed for your success.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all">
+              <img 
+                src="https://res.cloudinary.com/dxykzipbv/image/upload/v1770987696/Main_gym_photo.eRctNu7p_afph14.jpg"
+                alt="Main Gym Area"
+                className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="text-xl font-bold mb-2">Main Gym Area</h3>
+                  <p className="text-sm text-white/90">Our spacious main workout area with premium equipment</p>
+                </div>
+              </div>
             </div>
-            <div className="relative">
-              <div className="aspect-square bg-linear-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center">
-                <Dumbbell className="h-32 w-32 text-primary/40" />
+            <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all">
+              <img 
+                src="https://res.cloudinary.com/dxykzipbv/image/upload/v1770987697/leg_training_main_gym.hHQw3vft_ubw3m4.jpg"
+                alt="Leg Training Equipment"
+                className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="text-xl font-bold mb-2">Leg Training Zone</h3>
+                  <p className="text-sm text-white/90">Professional-grade leg training machines for strength building</p>
+                </div>
+              </div>
+            </div>
+            <div className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all">
+              <img 
+                src="https://res.cloudinary.com/dxykzipbv/image/upload/v1770987696/threadmill_side_gym.Dlb0ZbWL_vvpyji.jpg"
+                alt="Cardio Equipment"
+                className="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="text-xl font-bold mb-2">Cardio Equipment</h3>
+                  <p className="text-sm text-white/90">Modern treadmills and cardio machines for endurance training</p>
+                </div>
               </div>
             </div>
           </div>
@@ -149,7 +166,7 @@ const Home = () => {
               </Button>
             </Link>
             <Link to="/contact">
-              <Button size="lg" variant="outline" className="text-base bg-transparent border-2 hover:bg-primary-foreground/10">
+              <Button size="lg" className="text-base">
                 Contact Us
               </Button>
             </Link>
