@@ -1,6 +1,6 @@
 # UG Gymnasium Server
 
-Backend API for the University of Ghana Gymnasium application.
+Backend API for the University of Ghana Gymnasium application..
 
 ## Tech Stack
 
