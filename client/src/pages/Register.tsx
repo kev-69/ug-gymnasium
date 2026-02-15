@@ -327,13 +327,36 @@ const Register = () => {
               {formData.residence && (
                 <div className="space-y-2">
                   <Label htmlFor="hallOfResidence">Hall of Residence</Label>
-                  <Input
-                    id="hallOfResidence"
-                    name="hallOfResidence"
-                    value={formData.hallOfResidence}
-                    onChange={handleChange}
-                    placeholder="Enter your hall of residence"
-                  />
+                  <Select 
+                    value={formData.hallOfResidence} 
+                    onValueChange={(value: string) => {
+                      setFormData((prev) => ({ ...prev, hallOfResidence: value }));
+                      if (errors.hallOfResidence) {
+                        setErrors((prev) => ({ ...prev, hallOfResidence: '' }));
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your hall of residence" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Commonwealth Hall">Commonwealth Hall</SelectItem>
+                      <SelectItem value="Volta Hall">Volta Hall</SelectItem>
+                      <SelectItem value="Legon Hall">Legon Hall</SelectItem>
+                      <SelectItem value="Akuafo Hall">Akuafo Hall</SelectItem>
+                      <SelectItem value="International Student Hostel">International Student Hostel</SelectItem>
+                      <SelectItem value="Jubilee Hall">Jubilee Hall</SelectItem>
+                      <SelectItem value="Dr Hilla Liman Hall">Dr Hilla Liman Hall</SelectItem>
+                      <SelectItem value="Alexander Adum Kwapong Hall">Alexander Adum Kwapong Hall</SelectItem>
+                      <SelectItem value="Elizabeth Frances Sey Hall">Elizabeth Frances Sey Hall</SelectItem>
+                      <SelectItem value="Jean Nelson Hall">Jean Nelson Hall</SelectItem>
+                      <SelectItem value="Diamond Jubilee Hall">Diamond Jubilee Hall</SelectItem>
+                      <SelectItem value="Pent Hall">Pent Hall</SelectItem>
+                      <SelectItem value="Bani Hostel">Bani Hostel</SelectItem>
+                      <SelectItem value="Evandy Hostel">Evandy Hostel</SelectItem>
+                      <SelectItem value="James Topp Yankah Hall">James Topp Yankah Hall</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {errors.hallOfResidence && <p className="text-sm text-destructive">{errors.hallOfResidence}</p>}
                 </div>
               )}
