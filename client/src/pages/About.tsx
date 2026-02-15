@@ -179,11 +179,7 @@ const About = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary font-bold">•</span>
-                    <span>Locker rooms with showers</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary font-bold">•</span>
-                    <span>Free Wi-Fi and charging stations</span>
+                    <span>Locker rooms</span>
                   </li>
                 </ul>
               </div>
