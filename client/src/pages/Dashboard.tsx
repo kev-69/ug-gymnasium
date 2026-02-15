@@ -258,46 +258,25 @@ const Dashboard = () => {
               </Card>
             )}
 
-            {/* Recent Transactions */}
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Recent Transactions</h2>
-                <TrendingUp className="h-5 w-5 text-muted-foreground" />
-              </div>
-
-              {transactions.length > 0 ? (
+            {/* All Subscriptions */}
+            {subscriptions.length > 0 && (
+              <Card className="p-6 max-h-[calc(60vh-200px)] overflow-y-auto px-6 pb-6">
+                <h3 className="font-semibold mb-4">All Subscriptions</h3>
                 <div className="space-y-3">
-                  {transactions.map((transaction) => (
-                    <div
-                      key={transaction.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <CreditCard className="h-4 w-4 text-muted-foreground" />
-                          <p className="font-medium">
-                            {transaction.subscription?.plan?.name || 'Subscription Payment'}
-                          </p>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(transaction.createdAt)} • {transaction.paymentReference}
-                        </p>
+                  {subscriptions.map((sub) => (
+                    <div key={sub.id} className="p-3 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-medium text-sm">{sub.plan.name}</p>
+                        {getStatusBadge(sub.subscriptionStatus)}
                       </div>
-                      <div className="text-right">
-                        <p className="font-semibold mb-1">
-                          {formatCurrency(transaction.amount)}
-                        </p>
-                        {getPaymentStatusBadge(transaction.paymentStatus)}
-                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {formatDate(sub.createdAt)}
+                      </p>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>No transactions yet</p>
-                </div>
-              )}
-            </Card>
+              </Card>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -358,25 +337,46 @@ const Dashboard = () => {
               </div>
             </Card>
 
-            {/* All Subscriptions */}
-            {subscriptions.length > 0 && (
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">All Subscriptions</h3>
-                <div className="space-y-3">
-                  {subscriptions.map((sub) => (
-                    <div key={sub.id} className="p-3 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="font-medium text-sm">{sub.plan.name}</p>
-                        {getStatusBadge(sub.subscriptionStatus)}
+            {/* Recent Transactions Card */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Recent Transactions</h2>
+                <TrendingUp className="h-5 w-5 text-muted-foreground" />
+              </div>
+
+              {transactions.length > 0 ? (
+                <div className="space-y-3 p-6 max-h-[calc(60vh-200px)] overflow-y-auto px-6 pb-6">
+                  {transactions.map((transaction) => (
+                    <div
+                      key={transaction.id}
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-1">
+                          <CreditCard className="h-4 w-4 text-muted-foreground" />
+                          <p className="font-medium">
+                            {transaction.subscription?.plan?.name || 'Subscription Payment'}
+                          </p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {formatDate(transaction.createdAt)} • {transaction.paymentReference}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDate(sub.createdAt)}
-                      </p>
+                      <div className="text-right">
+                        <p className="font-semibold mb-1">
+                          {formatCurrency(transaction.amount)}
+                        </p>
+                        {getPaymentStatusBadge(transaction.paymentStatus)}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </Card>
-            )}
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No transactions yet</p>
+                </div>
+              )}
+            </Card>
           </div>
         </div>
       </div>
