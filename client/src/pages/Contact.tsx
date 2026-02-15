@@ -27,7 +27,7 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate sending contact form
+    // Simulate sending contact form data to the server
     setTimeout(() => {
       toast.success('Message sent successfully! We will get back to you soon.');
       setFormData({
@@ -44,7 +44,7 @@ const Contact = () => {
     {
       icon: <MapPin className="h-6 w-6 text-primary" />,
       title: 'Location',
-      details: ['University of Ghana', 'Legon Campus, Accra', 'Near the Main Library'],
+      details: ['University of Ghana', 'Legon Campus, Accra', 'Near the University of Ghana Stadium'],
     },
     {
       icon: <Phone className="h-6 w-6 text-primary" />,
@@ -54,7 +54,7 @@ const Contact = () => {
     {
       icon: <Mail className="h-6 w-6 text-primary" />,
       title: 'Email',
-      details: ['info@uggymnasium.edu.gh', 'membership@uggymnasium.edu.gh', 'support@uggymnasium.edu.gh'],
+      details: ['info@uggymnasium.ug.edu.gh', 'support@uggymnasium.ug.edu.gh'],
     },
     {
       icon: <Clock className="h-6 w-6 text-primary" />,
@@ -192,7 +192,7 @@ const Contact = () => {
                 <CardContent>
                   <div className="aspect-video bg-muted rounded-lg mb-4 overflow-hidden">
                     <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.6294447445347!2d-0.18773768478284735!3d5.651200595940447!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf9084b2b7a773%3A0xbed14ed8650e2dd3!2sUniversity%20of%20Ghana!5e0!3m2!1sen!2sgh!4v1645564234567!5m2!1sen!2sgh"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.505499143841!2d-0.18405582524487726!3d5.639742432802391!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf9b7bee42fa83%3A0xda52eab8cf744ef4!2sUniversity%20of%20Ghana%20Gym%20Center!5e0!3m2!1sen!2sgh!4v1771154548348!5m2!1sen!2sgh"
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
@@ -209,15 +209,11 @@ const Contact = () => {
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
                         <span className="text-primary font-bold">•</span>
-                        <span>5 minutes walk from the Main Library</span>
+                        <span>Few meters from the University of Ghana Stadium</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-primary font-bold">•</span>
                         <span>Parking available on-site</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-primary font-bold">•</span>
-                        <span>Accessible via campus shuttle service</span>
                       </li>
                     </ul>
                   </div>
@@ -238,7 +234,7 @@ const Contact = () => {
                     </p>
                     <p className="flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      <span>Email: info@uggymnasium.edu.gh</span>
+                      <span>Email: info@uggymnasium.ug.edu.gh</span>
                     </p>
                   </div>
                 </CardContent>
@@ -249,7 +245,7 @@ const Contact = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-muted/50">
+      <section id='faq' className="py-20 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
