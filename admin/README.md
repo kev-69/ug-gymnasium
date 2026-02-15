@@ -4,17 +4,17 @@ Admin dashboard for managing the University of Ghana Gymnasium subscription syst
 
 ## Features
 
-- í´ Admin authentication
-- í³Š Dashboard with statistics
-- í³‹ Plan management (CRUD operations)
-- í±¥ User management
-- í²° Transaction tracking
-- í¾¨ Modern UI with Tailwind CSS
-- í³± Responsive design
+- ï¿½ï¿½ï¿½ Admin authentication
+- ï¿½ï¿½ï¿½ Dashboard with statistics
+- ï¿½ï¿½ï¿½ Plan management (CRUD operations)
+- ï¿½ï¿½ï¿½ User management
+- ï¿½ï¿½ï¿½ Transaction tracking
+- ï¿½ï¿½ï¿½ Modern UI with Tailwind CSS
+- ï¿½ï¿½ï¿½ Responsive design
 
 ## Getting Started
 
-### Installation
+### Installations
 
 1. Install dependencies:
 ```bash
