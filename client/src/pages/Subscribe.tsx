@@ -194,7 +194,7 @@ const Subscribe = () => {
                     <Smartphone className={`h-6 w-6 ${paymentMethod === 'MOBILE_MONEY' ? 'text-primary' : 'text-muted-foreground'}`} />
                     <div className="text-left">
                       <p className="font-medium">Mobile Money</p>
-                      <p className="text-xs text-muted-foreground">MTN, Vodafone, AirtelTigo</p>
+                      <p className="text-xs text-muted-foreground">MTN, Telecel, AirtelTigo</p>
                     </div>
                     {paymentMethod === 'MOBILE_MONEY' && (
                       <Check className="h-5 w-5 text-primary ml-auto" />
