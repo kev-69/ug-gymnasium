@@ -189,7 +189,7 @@ const Subscriptions: React.FC = () => {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="max-h-[calc(100vh-350px)] overflow-y-auto px-6 pb-6">
+          <div className="max-h-[calc(60vh-150px)] overflow-y-auto px-6 pb-6">
             <SubscriptionsTable 
               subscriptions={filteredSubscriptions} 
               onViewSubscription={handleViewSubscription}
