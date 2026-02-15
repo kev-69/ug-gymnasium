@@ -95,12 +95,6 @@ const Subscribe = () => {
     return null;
   }
 
-  // Calculate fees (same as backend)
-  const paystackFeePercentage = 0.015; // 1.5%
-  const paystackFlatFee = 0.3; // GHS 0.30
-  const paystackFee = plan.price * paystackFeePercentage + paystackFlatFee;
-  const totalAmount = plan.price + paystackFee;
-
   return (
     <div className="min-h-screen bg-muted/30 py-12">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -232,15 +226,11 @@ const Subscribe = () => {
                   <span className="text-muted-foreground">Plan Price</span>
                   <span className="font-medium">{formatCurrency(plan.price)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Processing Fee</span>
-                  <span className="font-medium">{formatCurrency(paystackFee)}</span>
-                </div>
                 <div className="pt-3 border-t">
                   <div className="flex justify-between">
                     <span className="font-semibold">Total Amount</span>
                     <span className="text-xl font-bold text-primary">
-                      {formatCurrency(totalAmount)}
+                      {formatCurrency(plan.price)}
                     </span>
                   </div>
                 </div>
