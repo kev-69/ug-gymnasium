@@ -316,7 +316,7 @@ export const handlePaystackWebhook = async (req: Request, res: Response): Promis
 
     // Handle charge.success event
     if (event.event === 'charge.success') {
-      const { reference, metadata } = event.data;
+      const { reference } = event.data;
 
       const transaction = await prisma.transaction.findUnique({
         where: { paymentReference: reference },
@@ -361,6 +361,41 @@ export const handlePaystackWebhook = async (req: Request, res: Response): Promis
       }
     }
 
+    // Handle charge.failed event
+    if (event.event === 'charge.failed') {
+      const { reference } = event.data;
+
+      const transaction = await prisma.transaction.findUnique({
+        where: { paymentReference: reference },
+        include: {
+          subscription: true,
+        },
+      });
+
+      if (transaction && transaction.paymentStatus === PaymentStatus.PENDING) {
+        // Update transaction to failed
+        await prisma.transaction.update({
+          where: { id: transaction.id },
+          data: {
+            paymentStatus: PaymentStatus.FAILED,
+            paystackReference: reference,
+            metadata: event.data,
+          },
+        });
+
+        // Update subscription to failed
+        await prisma.subscription.update({
+          where: { id: transaction.subscriptionId },
+          data: {
+            subscriptionStatus: SubscriptionStatus.EXPIRED,
+            paymentStatus: PaymentStatus.FAILED,
+          },
+        });
+
+        logger.info(`Webhook: Payment failed for transaction ${transaction.id}`);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: 'Webhook received',
@@ -370,6 +405,86 @@ export const handlePaystackWebhook = async (req: Request, res: Response): Promis
     res.status(500).json({
       success: false,
       message: 'Webhook processing failed',
+    });
+  }
+};
+
+// Cleanup Abandoned Payments (Timeout-based)
+// This should be called periodically (e.g., via cron job)
+export const cleanupAbandonedPayments = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Payment timeout in minutes (default: 30 minutes)
+    const timeoutMinutes = parseInt(process.env.PAYMENT_TIMEOUT_MINUTES || '30');
+    const timeoutDate = new Date();
+    timeoutDate.setMinutes(timeoutDate.getMinutes() - timeoutMinutes);
+
+    // Find all pending transactions older than timeout
+    const abandonedTransactions = await prisma.transaction.findMany({
+      where: {
+        paymentStatus: PaymentStatus.PENDING,
+        createdAt: {
+          lt: timeoutDate, // Less than (older than) timeout date
+        },
+      },
+      include: {
+        subscription: true,
+      },
+    });
+
+    if (abandonedTransactions.length === 0) {
+      res.status(200).json({
+        success: true,
+        message: 'No abandoned payments found',
+        data: {
+          count: 0,
+        },
+      });
+      return;
+    }
+
+    // Update all abandoned transactions to FAILED
+    const failedCount = await prisma.$transaction(async (tx) => {
+      let count = 0;
+
+      for (const transaction of abandonedTransactions) {
+        // Update transaction
+        await tx.transaction.update({
+          where: { id: transaction.id },
+          data: {
+            paymentStatus: PaymentStatus.FAILED,
+          },
+        });
+
+        // Update subscription
+        await tx.subscription.update({
+          where: { id: transaction.subscriptionId },
+          data: {
+            subscriptionStatus: SubscriptionStatus.EXPIRED,
+            paymentStatus: PaymentStatus.FAILED,
+          },
+        });
+
+        count++;
+      }
+
+      return count;
+    });
+
+    logger.info(`Cleanup: Marked ${failedCount} abandoned payments as FAILED`);
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully marked ${failedCount} abandoned payment(s) as failed`,
+      data: {
+        count: failedCount,
+        timeoutMinutes,
+      },
+    });
+  } catch (error) {
+    logger.error('Cleanup Abandoned Payments Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to cleanup abandoned payments',
     });
   }
 };
