@@ -14,6 +14,7 @@ import userSubscriptionRoutes from './routes/user/subscription.routes';
 import userPaymentRoutes from './routes/user/payment.routes';
 import userTransactionRoutes from './routes/user/transaction.routes';
 import { startSubscriptionExpirationJob } from './jobs/subscriptionExpiration.job';
+import { startPaymentCleanupJob } from './jobs/paymentCleanup.job';
 
 dotenv.config();
 
@@ -87,6 +88,8 @@ app.listen(PORT, () => {
   logger.info(`📋 Admin Subscriptions: /api/admin/subscriptions`);
   logger.info(`💸 Admin Transactions: /api/admin/transactions`);  
   // Start cron jobs
-  startSubscriptionExpirationJob();});
+  startSubscriptionExpirationJob();
+  startPaymentCleanupJob();
+});
 
 export default app;
