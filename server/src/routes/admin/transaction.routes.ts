@@ -3,6 +3,7 @@ import {
   getAllTransactions,
   getTransactionById,
 } from '../../controllers/admin/transaction.controller';
+import { cleanupAbandonedPayments } from '../../controllers/user/payment.controller';
 import { validateRequest } from '../../middleware/validate.middleware';
 import { authenticate } from '../../middleware/auth.middleware';
 import {
@@ -20,5 +21,9 @@ router.get('/', validateRequest(getAllTransactionsSchema), getAllTransactions);
 
 // Get Transaction by ID
 router.get('/:id', validateRequest(getTransactionByIdSchema), getTransactionById);
+
+// Cleanup Abandoned Payments (timeout-based)
+// This can be called manually or via a scheduled job
+router.post('/cleanup-abandoned', cleanupAbandonedPayments);
 
 export default router;
