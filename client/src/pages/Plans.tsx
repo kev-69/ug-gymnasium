@@ -9,6 +9,7 @@ import type { Plan, User } from '@/types';
 import { formatCurrency } from '@/utils/helpers';
 import { Search, Check, Loader2, ArrowRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 
 const Plans = () => {
   const navigate = useNavigate();
@@ -120,17 +121,21 @@ const Plans = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Role Filter */}
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+              <Select 
+                value={roleFilter} 
+                onValueChange={setRoleFilter}
                 disabled={isAuthenticated}
-                className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <option value="ALL">All Roles</option>
-                <option value={UserRole.STUDENT}>Students</option>
-                <option value={UserRole.STAFF}>Staff</option>
-                <option value={UserRole.PUBLIC}>Public</option>
-              </select>
+                <SelectTrigger className="min-w-40">
+                  <span>{roleFilter === 'ALL' ? 'All Roles' : roleFilter}</span>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Roles</SelectItem>
+                  <SelectItem value={UserRole.STUDENT}>Students</SelectItem>
+                  <SelectItem value={UserRole.STAFF}>Staff</SelectItem>
+                  <SelectItem value={UserRole.PUBLIC}>Public</SelectItem>
+                </SelectContent>
+              </Select>
 
               {/* Search */}
               <div className="relative w-full sm:min-w-62.5">
