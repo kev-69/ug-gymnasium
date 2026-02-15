@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dumbbell, Users, Clock, Trophy, Heart, Target, ArrowRight, Check } from 'lucide-react';
+import { Dumbbell, Users, Clock, Trophy, Heart, Target, ArrowRight } from 'lucide-react';
 
 const Home = () => {
   const features = [
