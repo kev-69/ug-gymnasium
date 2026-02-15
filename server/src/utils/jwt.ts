@@ -1,5 +1,15 @@
 import jwt from 'jsonwebtoken';
 import { UserRole } from '@prisma/client';
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
+const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN;
+
+if (!JWT_SECRET || !JWT_REFRESH_SECRET || !JWT_EXPIRES_IN || !JWT_REFRESH_EXPIRES_IN) {
+  throw new Error('JWT configuration is incomplete. Please set JWT_SECRET, JWT_REFRESH_SECRET, JWT_EXPIRES_IN, and JWT_REFRESH_EXPIRES_IN in the environment variables.');
+}
+
 interface AdminJwtPayload {
   userId: string;
   email: string;
@@ -16,11 +26,6 @@ interface TokenPair {
   accessToken: string;
   refreshToken: string;
 }
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '15m';
-const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
 
 /**
  * Generate access token (short-lived)
