@@ -6,7 +6,6 @@ import {
   login,
   refreshToken,
   getProfile,
-  logout,
   forgotPassword,
   resetPassword,
 } from '../../controllers/user/auth.controller';
@@ -77,13 +76,6 @@ router.post('/refresh', validateRequest(refreshTokenSchema), refreshToken);
  * @access  Private
  */
 router.get('/profile', authenticate, getProfile);
-
-/**
- * @route   POST /api/auth/logout
- * @desc    Logout user
- * @access  Private
- */
-router.post('/logout', authenticate, logout);
 
 /**
  * @route   POST /api/auth/forgot-password
