@@ -230,11 +230,11 @@ const Contact = () => {
                   <div className="space-y-2 text-sm">
                     <p className="flex items-center gap-2">
                       <Phone className="h-4 w-4" />
-                      <span>Call: +233 (0) 55 123 4567</span>
+                      <span>Call: +233 (0) 555 419 992</span>
                     </p>
                     <p className="flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      <span>Email: info@uggymnasium.ug.edu.gh</span>
+                      <span>Email: info@gymnasium.ug.edu.gh</span>
                     </p>
                   </div>
                 </CardContent>
