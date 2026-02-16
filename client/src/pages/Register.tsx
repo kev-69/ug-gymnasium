@@ -141,11 +141,12 @@ const Register = () => {
         });
       }
 
-      const { user, accessToken } = response.data.data;
+      const { user, accessToken, refreshToken } = response.data.data;
 
-      // Store user data and token
+      // Store user data and tokens
       localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', accessToken);
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
 
       // Trigger auth state change event
       window.dispatchEvent(new Event('authStateChanged'));
