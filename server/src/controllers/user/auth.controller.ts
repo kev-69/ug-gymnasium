@@ -434,28 +434,6 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
 };
 
 /**
- * Logout (client-side handles token removal, but we can log it)
- */
-export const logout = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (req.user) {
-      logger.info(`User logged out: ${req.user.email}`);
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Logout successful',
-    });
-  } catch (error) {
-    logger.error('Logout error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Logout failed',
-    });
-  }
-};
-
-/**
  * Forgot Password - Generate reset token
  */
 export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
