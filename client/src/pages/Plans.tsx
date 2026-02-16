@@ -22,7 +22,7 @@ const Plans = () => {
 
   useEffect(() => {
     // Check if user is logged in and get their role
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     const userStr = localStorage.getItem('user');
     
     if (token && userStr) {
