@@ -188,15 +188,15 @@ const About = () => {
                 <ul className="space-y-3 text-muted-foreground">
                   <li className="flex justify-between">
                     <span className="font-medium">Monday - Friday:</span>
-                    <span>5:00 AM - 10:00 PM</span>
+                    <span>6:00 AM - 8:00 PM</span>
                   </li>
                   <li className="flex justify-between">
                     <span className="font-medium">Saturday:</span>
-                    <span>7:00 AM - 8:00 PM</span>
+                    <span>6:00 AM - 12:00 PM</span>
                   </li>
                   <li className="flex justify-between">
                     <span className="font-medium">Sunday:</span>
-                    <span>8:00 AM - 6:00 PM</span>
+                    <span>Closed</span>
                   </li>
                   <li className="flex justify-between pt-4 border-t">
                     <span className="font-medium">Public Holidays:</span>
