@@ -248,23 +248,3 @@ export const getAdminProfile = async (req: Request, res: Response): Promise<void
     });
   }
 };
-
-// Admin Logout (Placeholder)
-export const adminLogout = async (req: Request, res: Response): Promise<void> => {
-  try {
-    // In a production app, you might want to blacklist the token here
-    // For now, just return success
-    logger.info(`Admin logged out: ${req.user?.email || 'Unknown'}`);
-
-    res.status(200).json({
-      success: true,
-      message: 'Logged out successfully',
-    });
-  } catch (error) {
-    logger.error('Admin Logout Error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error during logout',
-    });
-  }
-};
