@@ -49,17 +49,17 @@ const Contact = () => {
     {
       icon: <Phone className="h-6 w-6 text-primary" />,
       title: 'Phone',
-      details: ['+233 (0) 302 500 381', '+233 (0) 55 123 4567', 'Mon-Fri: 8AM - 6PM'],
+      details: ['+233 (0) 555 419 992', 'Mon-Fri: 6AM - 8PM'],
     },
     {
       icon: <Mail className="h-6 w-6 text-primary" />,
       title: 'Email',
-      details: ['info@uggymnasium.ug.edu.gh', 'support@uggymnasium.ug.edu.gh'],
+      details: ['info@gymnasium.ug.edu.gh', 'support@gymnasium.ug.edu.gh'],
     },
     {
       icon: <Clock className="h-6 w-6 text-primary" />,
       title: 'Operating Hours',
-      details: ['Mon-Fri: 5AM - 10PM', 'Saturday: 7AM - 8PM', 'Sunday: 8AM - 6PM'],
+      details: ['Mon-Fri: 6AM - 8PM', 'Saturday: 6AM - 12PM', 'Sunday: Closed'],
     },
   ];
 
