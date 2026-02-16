@@ -4,7 +4,6 @@ import {
   adminLogin,
   adminRefreshToken,
   getAdminProfile,
-  adminLogout,
 } from '../../controllers/admin/auth.controller';
 import { validateRequest } from '../../middleware/validate.middleware';
 import { authenticate } from '../../middleware/auth.middleware';
@@ -27,8 +26,5 @@ router.post('/refresh', validateRequest(refreshTokenSchema), adminRefreshToken);
 
 // Get Admin Profile (Protected)
 router.get('/profile', authenticate, getAdminProfile);
-
-// Admin Logout (Protected)
-router.post('/logout', authenticate, adminLogout);
 
 export default router;
