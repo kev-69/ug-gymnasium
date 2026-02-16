@@ -12,12 +12,12 @@ const Navbar = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     setIsAuthenticated(!!token);
 
     // Listen for auth state changes
     const handleAuthChange = () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       setIsAuthenticated(!!token);
     };
 
@@ -36,7 +36,8 @@ const Navbar = () => {
       console.error('Logout error:', error);
     } finally {
       // Clear local storage and update state
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       setIsAuthenticated(false);
       setIsMenuOpen(false);
