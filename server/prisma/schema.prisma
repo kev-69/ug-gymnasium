@@ -40,6 +40,13 @@ enum PaymentMethod {
   MOBILE_MONEY
 }
 
+enum ContactStatus {
+  NEW
+  READ
+  RESPONDED
+  ARCHIVED
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -186,4 +193,30 @@ model Admin {
   
   @@index([email])
   @@map("admins")
+}
+
+model Contact {
+  id              String        @id @default(uuid())
+  
+  // Contact Details
+  name            String
+  email           String
+  subject         String
+  message         String        @db.Text
+  
+  // Status tracking
+  status          ContactStatus @default(NEW)
+  
+  // Response tracking
+  respondedAt     DateTime?
+  respondedBy     String?       // Admin ID or email who responded
+  responseNotes   String?       @db.Text
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("contacts")
 }
