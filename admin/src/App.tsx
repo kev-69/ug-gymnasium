@@ -10,6 +10,7 @@ import Plans from './pages/Plans';
 import Users from './pages/Users';
 import Subscriptions from './pages/Subscriptions';
 import Transactions from './pages/Transactions';
+import Contacts from './pages/Contacts';
 
 function App() {
   return (
@@ -65,6 +66,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Transactions />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/contacts"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Contacts />
                   </Layout>
                 </ProtectedRoute>
               }
