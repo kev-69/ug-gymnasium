@@ -146,6 +146,32 @@ class ApiService {
     const response = await this.api.get<ApiResponse>('/admin/subscriptions/stats');
     return response.data;
   }
+
+  // Contact endpoints
+  async getContacts(params?: { page?: number; limit?: number; status?: string; search?: string; sortBy?: string; sortOrder?: string }) {
+    const response = await this.api.get<ApiResponse>('/admin/contacts', { params });
+    return response.data;
+  }
+
+  async getContact(id: string) {
+    const response = await this.api.get<ApiResponse>(`/admin/contacts/${id}`);
+    return response.data;
+  }
+
+  async updateContactStatus(id: string, data: { status: string; responseNotes?: string }) {
+    const response = await this.api.patch<ApiResponse>(`/admin/contacts/${id}`, data);
+    return response.data;
+  }
+
+  async deleteContact(id: string) {
+    const response = await this.api.delete<ApiResponse>(`/admin/contacts/${id}`);
+    return response.data;
+  }
+
+  async getContactStats() {
+    const response = await this.api.get<ApiResponse>('/admin/contacts/stats');
+    return response.data;
+  }
 }
 
 export default new ApiService();
