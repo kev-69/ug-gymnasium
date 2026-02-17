@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from './theme-provider';
 import { Button } from './ui/button';
-import { LayoutDashboard, CreditCard, Users, FileText, Receipt, LogOut, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Users, FileText, Receipt, LogOut, Sun, Moon, Mail } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -30,6 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/users', label: 'Users', icon: Users },
     { path: '/subscriptions', label: 'Subscriptions', icon: FileText },
     { path: '/transactions', label: 'Transactions', icon: Receipt },
+    { path: '/contacts', label: 'Contacts', icon: Mail },
   ];
 
   return (
