@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
+import api from '@/services/api';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -27,17 +28,27 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate sending contact form data to the server
-    setTimeout(() => {
-      toast.success('Message sent successfully! We will get back to you soon.');
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-      });
+    try {
+      const response = await api.post('/contact', formData);
+      
+      if (response.data.success) {
+        toast.success(response.data.message || 'Message sent successfully! We will get back to you soon.');
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+      } else {
+        toast.error(response.data.message || 'Failed to send message. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Error sending contact form:', error);
+      const errorMessage = error.response?.data?.message || 'An error occurred while sending your message. Please try again later.';
+      toast.error(errorMessage);
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   const contactInfo = [
