@@ -36,6 +36,12 @@ Required environment variables:
 - `JWT_EXPIRES_IN` - JWT expiration time
 - `PAYSTACK_SECRET_KEY` - Paystack secret key
 - `PAYSTACK_PUBLIC_KEY` - Paystack public key
+- `EMAIL_HOST` - SMTP server host (e.g., smtp.gmail.com)
+- `EMAIL_PORT` - SMTP server port (e.g., 587)
+- `EMAIL_SECURE` - Use TLS (true/false)
+- `EMAIL_USER` - Email account username
+- `EMAIL_PASSWORD` - Email account password (use App Password for Gmail)
+- `CONTACT_EMAIL` - Email address to receive contact form submissions
 
 ## Installation
 
@@ -63,6 +69,70 @@ npm run prisma:generate
 ```bash
 npm run prisma:seed
 ```
+
+## Email Setup
+
+The application sends emails for:
+
+- **Contact form** submissions
+- **Subscription confirmations** when users successfully subscribe
+- **Expiration warnings** a few days before subscription expires
+- **Expiration notifications** when subscription expires
+
+All email functionality uses nodemailer. Follow these steps to set up:
+
+1. Install nodemailer (if not already installed):
+
+```bash
+npm install nodemailer @types/nodemailer
+```
+
+2. Configure email settings in your `.env` file:
+
+### Using Gmail
+
+To use Gmail as your SMTP server:
+
+1. Enable 2-Factor Authentication on your Google account
+2. Generate an App Password:
+   - Go to https://myaccount.google.com/security
+   - Under "2-Step Verification", click "App passwords"
+   - Select "Mail" and your device
+   - Copy the generated 16-character password
+3. Update your `.env`:
+
+```env
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASSWORD=your-16-char-app-password
+CONTACT_EMAIL=info@gymnasium.ug.edu.gh
+EXPIRATION_WARNING_DAYS=3
+```
+
+**Email Configuration:**
+
+- `EMAIL_HOST`: SMTP server hostname
+- `EMAIL_PORT`: SMTP server port (587 for TLS)
+- `EMAIL_SECURE`: Set to `true` for port 465, `false` for others
+- `EMAIL_USER`: Your email account
+- `EMAIL_PASSWORD`: Your email password (use App Password for Gmail)
+- `CONTACT_EMAIL`: Email address to receive contact form submissions
+- `EXPIRATION_WARNING_DAYS`: Days before expiration to send warning (default: 3)
+
+### Using Other Email Providers
+
+For other providers (SendGrid, Mailgun, etc.), consult their SMTP documentation and update the settings accordingly.
+
+### Testing Email Locally
+
+For development, you can use services like:
+
+- [Mailtrap](https://mailtrap.io/) - Fake SMTP server for testing
+- [Ethereal Email](https://ethereal.email/) - Fake SMTP service by nodemailer
+
+Update your `.env` with the test SMTP credentials during development.
 
 ## Development
 
