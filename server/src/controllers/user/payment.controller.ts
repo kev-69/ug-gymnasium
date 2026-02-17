@@ -4,6 +4,7 @@ import logger from '../../utils/logger';
 import { PaymentStatus, SubscriptionStatus } from '@prisma/client';
 import axios from 'axios';
 import { calculateDeveloperShare, calculateBasePrice } from '../../config/constants';
+import emailService from '../../utils/email';
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
@@ -197,6 +198,7 @@ export const verifyPayment = async (req: Request, res: Response): Promise<void> 
             subscription: {
               include: {
                 plan: true,
+                user: true,
               },
             },
           },
@@ -247,6 +249,19 @@ export const verifyPayment = async (req: Request, res: Response): Promise<void> 
         });
 
         logger.info(`Payment verified and subscription activated: ${transaction.id}`);
+
+        // Send subscription confirmation email (async, don't wait)
+        emailService.sendSubscriptionConfirmation({
+          userName: transaction.subscription.user.surname + ' ' + transaction.subscription.user.otherNames,
+          userEmail: transaction.subscription.user.email,
+          planName: transaction.subscription.plan.name,
+          duration: transaction.subscription.plan.duration,
+          amount: transaction.amount,
+          startDate,
+          endDate,
+        }).catch(error => {
+          logger.error('Failed to send subscription confirmation email:', error);
+        });
 
         res.status(200).json({
           success: true,
@@ -324,6 +339,7 @@ export const handlePaystackWebhook = async (req: Request, res: Response): Promis
           subscription: {
             include: {
               plan: true,
+              user: true,
             },
           },
         },
@@ -358,6 +374,19 @@ export const handlePaystackWebhook = async (req: Request, res: Response): Promis
         });
 
         logger.info(`Webhook: Payment completed for transaction ${transaction.id}`);
+
+        // Send subscription confirmation email (async, don't wait)
+        emailService.sendSubscriptionConfirmation({
+          userName: transaction.subscription.user.surname + ' ' + transaction.subscription.user.otherNames,
+          userEmail: transaction.subscription.user.email,
+          planName: transaction.subscription.plan.name,
+          duration: transaction.subscription.plan.duration,
+          amount: transaction.amount,
+          startDate,
+          endDate,
+        }).catch(error => {
+          logger.error('Webhook: Failed to send subscription confirmation email:', error);
+        });
       }
     }
 
