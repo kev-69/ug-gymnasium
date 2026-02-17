@@ -8,11 +8,13 @@ import adminPlanRoutes from './routes/admin/plan.routes';
 import adminUserRoutes from './routes/admin/user.routes';
 import adminTransactionRoutes from './routes/admin/transaction.routes';
 import adminSubscriptionRoutes from './routes/admin/subscription.routes';
+import adminContactRoutes from './routes/admin/contact.routes';
 import authRoutes from './routes/user/auth.routes';
 import userPlanRoutes from './routes/user/plan.routes';
 import userSubscriptionRoutes from './routes/user/subscription.routes';
 import userPaymentRoutes from './routes/user/payment.routes';
 import userTransactionRoutes from './routes/user/transaction.routes';
+import contactRoutes from './routes/user/contact.routes';
 import { startSubscriptionExpirationJob } from './jobs/subscriptionExpiration.job';
 import { startPaymentCleanupJob } from './jobs/paymentCleanup.job';
 
@@ -50,11 +52,13 @@ app.use('/api/plans', userPlanRoutes);
 app.use('/api/subscriptions', userSubscriptionRoutes);
 app.use('/api/payments', userPaymentRoutes);
 app.use('/api/transactions', userTransactionRoutes);
+app.use('/api/contact', contactRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/admin/plans', adminPlanRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/transactions', adminTransactionRoutes);
 app.use('/api/admin/subscriptions', adminSubscriptionRoutes);
+app.use('/api/admin/contacts', adminContactRoutes);
 
 // 404 Handler
 app.use((req: Request, res: Response) => {
@@ -82,6 +86,7 @@ app.listen(PORT, () => {
   logger.info(`📝 User Subscriptions: /api/subscriptions`);
   logger.info(`💳 User Payments: /api/payments`);
   logger.info(`� User Transactions: /api/transactions`);
+  logger.info(`📧 Contact Form: /api/contact`);  
   logger.info(`👑 Admin Auth: /api/admin/auth`);
   logger.info(`📊 Admin Plans: /api/admin/plans`);
   logger.info(`👥 Admin Users: /api/admin/users`);
