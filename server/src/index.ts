@@ -1,6 +1,10 @@
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST before other imports
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import morganMiddleware from './middleware/morgan';
 import logger from './utils/logger';
 import adminAuthRoutes from './routes/admin/auth.routes';
@@ -17,8 +21,6 @@ import userTransactionRoutes from './routes/user/transaction.routes';
 import contactRoutes from './routes/user/contact.routes';
 import { startSubscriptionExpirationJob } from './jobs/subscriptionExpiration.job';
 import { startPaymentCleanupJob } from './jobs/paymentCleanup.job';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
