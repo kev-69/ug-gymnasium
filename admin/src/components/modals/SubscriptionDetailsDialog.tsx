@@ -9,6 +9,16 @@ import { Separator } from '@/components/ui/separator';
 import { FileText, User, CreditCard, Calendar, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '@/services/api';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface SubscriptionDetailsDialogProps {
   subscription: Subscription | null;
@@ -52,14 +62,11 @@ export const SubscriptionDetailsDialog: React.FC<SubscriptionDetailsDialogProps>
   onUpdate,
 }) => {
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
   if (!subscription) return null;
 
   const handleCancelSubscription = async () => {
-    if (!confirm('Are you sure you want to cancel this subscription? This action cannot be undone.')) {
-      return;
-    }
-
     setIsCancelling(true);
     try {
       await api.updateSubscriptionStatus(subscription.id, 'CANCELLED');
@@ -240,7 +247,7 @@ export const SubscriptionDetailsDialog: React.FC<SubscriptionDetailsDialogProps>
         {subscription.subscriptionStatus !== 'CANCELLED' && subscription.subscriptionStatus !== 'EXPIRED' && (
           <DialogFooter className="mt-6">
             <Button 
-              onClick={handleCancelSubscription} 
+              onClick={() => setIsCancelDialogOpen(true)}
               variant="destructive"
               disabled={isCancelling}
             >
@@ -256,6 +263,22 @@ export const SubscriptionDetailsDialog: React.FC<SubscriptionDetailsDialogProps>
           </DialogFooter>
         )}
       </DialogContent>
+      
+      {/* Cancel Confirmation Dialog */}
+      <AlertDialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently cancel this subscription.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsCancelDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelSubscription}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };
