@@ -27,9 +27,23 @@ interface SubscriptionEmailData {
 
 class EmailService {
   private transporter: nodemailer.Transporter;
+  private isConfigured: boolean = false;
 
   constructor() {
-    // Create transporter with Gmail or other email service
+    // Check if email is configured
+    if (!process.env.EMAIL_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+      logger.warn('Email service not configured. Email functionality will be disabled.');
+      this.isConfigured = false;
+      // Create a dummy transporter to prevent errors
+      this.transporter = nodemailer.createTransport({
+        streamTransport: true,
+        newline: 'unix',
+        buffer: true,
+      });
+      return;
+    }
+
+    // Create transporter with timeout and connection pooling
     this.transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: parseInt(process.env.EMAIL_PORT || '587'),
@@ -38,14 +52,24 @@ class EmailService {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
       },
+      // Add connection pooling and timeout settings
+      pool: true,
+      maxConnections: 1,
+      maxMessages: 3,
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000, // 10 seconds
+      socketTimeout: 15000, // 15 seconds
     });
 
-    // Verify transporter configuration
+    // Verify transporter configuration (non-blocking)
     this.transporter.verify((error: Error | null) => {
       if (error) {
-        logger.error('Email service configuration error:', error);
+        logger.error('Email service configuration error:', error.message);
+        logger.warn('Emails will not be sent. Please check your email configuration.');
+        this.isConfigured = false;
       } else {
-        logger.info('Email service is ready to send messages');
+        logger.info('✅ Email service is ready to send messages');
+        this.isConfigured = true;
       }
     });
   }
@@ -54,6 +78,12 @@ class EmailService {
    * Send a generic email
    */
   async sendEmail(options: EmailOptions): Promise<boolean> {
+    // Skip if email service is not configured
+    if (!this.isConfigured) {
+      logger.warn(`Email not sent (service not configured): ${options.subject}`);
+      return false;
+    }
+
     try {
       const mailOptions = {
         from: `"UG Gymnasium" <${process.env.EMAIL_USER}>`,
@@ -64,10 +94,17 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      logger.info(`Email sent: ${info.messageId}`);
+      logger.info(`✅ Email sent successfully: ${info.messageId} - ${options.subject}`);
       return true;
-    } catch (error) {
-      logger.error('Error sending email:', error);
+    } catch (error: any) {
+      // Log error but don't throw - email failures should not break the application
+      logger.error(`❌ Error sending email (${options.subject}):`, error.message || error);
+      
+      // If it's a connection timeout, suggest checking configuration
+      if (error.message?.includes('timeout') || error.code === 'ETIMEDOUT') {
+        logger.warn('Email connection timeout. Please verify EMAIL_HOST, EMAIL_PORT, and credentials in .env file');
+      }
+      
       return false;
     }
   }
