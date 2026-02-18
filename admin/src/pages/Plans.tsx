@@ -10,6 +10,16 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Plus, Edit, Trash2, Check, Loader2, Search } from 'lucide-react';
 import { PlanFormDialog } from '@/components/modals/PlanFormDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const Plans: React.FC = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -19,6 +29,8 @@ const Plans: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletePlanId, setDeletePlanId] = useState<string>('');
 
   const [formData, setFormData] = useState<{
     name: string;
@@ -79,8 +91,6 @@ const Plans: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this plan?')) return;
-
     try {
       await api.deletePlan(id);
       toast.success('Plan deleted successfully');
@@ -254,7 +264,10 @@ const Plans: React.FC = () => {
               <Button
                 variant="outline"
                 className="flex-1 border-red-600 text-red-600 hover:bg-red-600 hover:text-white focus:ring-red-600"
-                onClick={() => handleDelete(plan.id)}
+                onClick={() => {
+                  setDeletePlanId(plan.id);
+                  setShowDeleteDialog(true);
+                }}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
@@ -280,6 +293,22 @@ const Plans: React.FC = () => {
         onSubmit={handleSubmit}
         onClose={closeModal}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the plan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleDelete(deletePlanId)}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
