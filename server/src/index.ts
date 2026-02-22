@@ -85,15 +85,7 @@ app.listen(PORT, () => {
   logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
   logger.info(`🔐 User Auth: /api/auth`);
   logger.info(`📋 User Plans: /api/plans`);
-  logger.info(`📝 User Subscriptions: /api/subscriptions`);
-  logger.info(`💳 User Payments: /api/payments`);
-  logger.info(`� User Transactions: /api/transactions`);
-  logger.info(`📧 Contact Form: /api/contact`);  
-  logger.info(`👑 Admin Auth: /api/admin/auth`);
-  logger.info(`📊 Admin Plans: /api/admin/plans`);
-  logger.info(`👥 Admin Users: /api/admin/users`);
-  logger.info(`📋 Admin Subscriptions: /api/admin/subscriptions`);
-  logger.info(`💸 Admin Transactions: /api/admin/transactions`);  
+  logger.info(`📧 Contact Form: /api/contact`);   
   // Start cron jobs
   startSubscriptionExpirationJob();
   startPaymentCleanupJob();
